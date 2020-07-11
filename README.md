@@ -1,2 +1,2 @@
 # competitive-programming
-Online judges solves
+Online judges solves and algorithms
