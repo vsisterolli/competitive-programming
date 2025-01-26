@@ -29,39 +29,25 @@ freopen((s+".out").c_str( ),"w",stdout);
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 998244353, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
-ll solve(int x, int y) {
-    ll ans = 0;
-    swap(x, y); // i confused x and y btw xD
 
-    if(x > y) {
-        if(x & 1)
-            ans = 1ll * x * x;
-        else ans = 1ll * (x - 1) * (x - 1) + 1;
 
-        ans += (x & 1 ? 1 - y : y - 1);
-    }
-    else {
-        if(y & 1)
-            ans = 1ll * (y - 1) * (y - 1) + 1;
-        else ans = 1ll * y * y;
-        
-        ans += (y & 1 ? x - 1 : 1 - x);
-    }
-    
-    return ans;
-}
 
 int32_t main() {
-    int ct;
-    cin >> ct;
-    while(ct--) {
-        int x, y;
-        cin >> x >> y;
-        cout << solve(x, y) << endl;
+    int n;
+    cin >> n;
+
+    while(n--) {
+        ll a, b;
+        cin >> a >> b;
+        
+        if(2ll * b - a >= 0 && 2ll * a - b >= 0 && (2ll * b - a) % 3 == 0 && (2ll * a - b) % 3 == 0 )
+            cout << "YES" << endl;
+        else cout << "NO" << endl;
     }
 }
+

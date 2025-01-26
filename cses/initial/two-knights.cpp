@@ -6,6 +6,7 @@
 #define INF 0x3f3f3f3f
 #define LINF 0x3f3f3f3f3f3f3f3f
 #define endl '\n'
+#define int long long
 #define ll long long
 #define f first
 #define fin cin
@@ -34,34 +35,33 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
-ll solve(int x, int y) {
-    ll ans = 0;
-    swap(x, y); // i confused x and y btw xD
 
-    if(x > y) {
-        if(x & 1)
-            ans = 1ll * x * x;
-        else ans = 1ll * (x - 1) * (x - 1) + 1;
+ll solve(int n) {
 
-        ans += (x & 1 ? 1 - y : y - 1);
+    if(n == 1) {
+        cout << 0 << endl;
+        return 0;
     }
-    else {
-        if(y & 1)
-            ans = 1ll * (y - 1) * (y - 1) + 1;
-        else ans = 1ll * y * y;
-        
-        ans += (y & 1 ? x - 1 : 1 - x);
+
+    cout << 0 << endl << 6 << endl;
+    ll prev = 6;
+
+    for(int i = 3; i <= n; i++) {
+        ll total = 1ll *  (i * i) * (i * i - 1)/2 - ((i - 1) * (i - 1)) * ((i - 1) * (i - 1) - 1)/2;
+        total += prev;
+
+        total -= 1LL * 8 * i - 16;
+        cout << total << endl;
+
+        prev = total;
     }
-    
-    return ans;
+
+    return prev;
 }
 
 int32_t main() {
-    int ct;
-    cin >> ct;
-    while(ct--) {
-        int x, y;
-        cin >> x >> y;
-        cout << solve(x, y) << endl;
-    }
+    int n;
+    cin >> n;
+
+    solve(n);
 }
