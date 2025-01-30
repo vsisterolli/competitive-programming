@@ -34,51 +34,41 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
+int BIT[MAXN];
+int N;
+void update(int x,int val) { while(x<=N)  {  BIT[x]+=val;  x+=(x&-x);  } }
+int query(int x) {  int res=0;  while(x>0)  {  res+=BIT[x];  x-=(x&-x);  } return res; } 
+
+
+
 int32_t main() {
-    int n, q;
-    cin >> n >> q;
+    FAST;   
+    int n, k;
+    cin >> n >> k;
+    N = n;
 
-    vector<int> v(n), pos(n + 1);
+    int last = 0;
     for(int i = 0; i < n; i++) {
-        cin >> v[i];
-        pos[v[i]] = i;
-    }
+        int jump = k % (n - i);
+        int toDelete = (last + jump) % (n - i);
+        last = toDelete;
 
-    int ans = 0;
-    vector<int> contributing(n+1);
-    for(int i = 2; i <= n; i++) {
-        contributing[i] = pos[i] < pos[i-1];
-        ans += contributing[i];
-    }
+        int ini = 1, mid, end = n;
+        while(ini <= end) {
+            int mid = (ini + end)/2;
+            int rmv = query(mid);
 
-    while(q--) {
-        
-        int a, b;
-        cin >> a >> b;
-        
-        a--, b--;
-        swap(v[a], v[b]);
-        a = v[a];
-        b = v[b];
-
-        set<int> s;
-        if(a < n)
-            s.insert(a + 1);
-        if(b < n)
-            s.insert(b + 1);
-        s.insert(a); s.insert(b);
-
-        for(auto i : s)
-            ans -= contributing[i];
-
-        swap(pos[a], pos[b]);
-
-        for(auto i : s) {
-            contributing[i] = pos[i] < pos[i-1];
-            ans += contributing[i];
+            
+            if(mid - rmv - 1 < toDelete) 
+                ini = mid + 1;
+            else if(mid - rmv - 1 > toDelete)
+                end = mid - 1;
+            else {
+                cout << mid << " ";
+                update(mid, 1);
+                break;
+            }
         }
-
-        cout << ans + 1 << endl;
     }
-    
+
 }

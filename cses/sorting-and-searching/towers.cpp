@@ -35,50 +35,21 @@ typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
 int32_t main() {
-    int n, q;
-    cin >> n >> q;
+    FAST;
+    int n;
+    cin >> n;
 
-    vector<int> v(n), pos(n + 1);
-    for(int i = 0; i < n; i++) {
-        cin >> v[i];
-        pos[v[i]] = i;
-    }
+    multiset<int> towers;
+    while(n--) {
+        int x;
+        cin >> x;  
 
-    int ans = 0;
-    vector<int> contributing(n+1);
-    for(int i = 2; i <= n; i++) {
-        contributing[i] = pos[i] < pos[i-1];
-        ans += contributing[i];
-    }
-
-    while(q--) {
+        auto tw = towers.upper_bound(x);
+        if(tw != towers.end())
+            towers.erase(tw);
         
-        int a, b;
-        cin >> a >> b;
-        
-        a--, b--;
-        swap(v[a], v[b]);
-        a = v[a];
-        b = v[b];
-
-        set<int> s;
-        if(a < n)
-            s.insert(a + 1);
-        if(b < n)
-            s.insert(b + 1);
-        s.insert(a); s.insert(b);
-
-        for(auto i : s)
-            ans -= contributing[i];
-
-        swap(pos[a], pos[b]);
-
-        for(auto i : s) {
-            contributing[i] = pos[i] < pos[i-1];
-            ans += contributing[i];
-        }
-
-        cout << ans + 1 << endl;
+        towers.insert(x);
     }
+    cout << towers.size() << endl;
     
 }

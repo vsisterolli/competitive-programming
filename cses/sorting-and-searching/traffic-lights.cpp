@@ -35,50 +35,37 @@ typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
 int32_t main() {
+    FAST;
     int n, q;
     cin >> n >> q;
 
-    vector<int> v(n), pos(n + 1);
-    for(int i = 0; i < n; i++) {
-        cin >> v[i];
-        pos[v[i]] = i;
-    }
+    set<int> tfl;
+    multiset<int> ans;
 
-    int ans = 0;
-    vector<int> contributing(n+1);
-    for(int i = 2; i <= n; i++) {
-        contributing[i] = pos[i] < pos[i-1];
-        ans += contributing[i];
-    }
+    tfl.insert(0);
+    tfl.insert(n);
+    ans.insert(n);
 
     while(q--) {
-        
-        int a, b;
-        cin >> a >> b;
-        
-        a--, b--;
-        swap(v[a], v[b]);
-        a = v[a];
-        b = v[b];
+        int x;
+        cin >> x;
 
-        set<int> s;
-        if(a < n)
-            s.insert(a + 1);
-        if(b < n)
-            s.insert(b + 1);
-        s.insert(a); s.insert(b);
+        auto aux = tfl.upper_bound(x);
 
-        for(auto i : s)
-            ans -= contributing[i];
+        int r = *aux;
+        aux--;
+        int l = *aux;
 
-        swap(pos[a], pos[b]);
+        ans.erase(ans.find(r - l));
+        ans.insert(r - x);
+        ans.insert(x - l);
 
-        for(auto i : s) {
-            contributing[i] = pos[i] < pos[i-1];
-            ans += contributing[i];
-        }
+        tfl.insert(x);
 
-        cout << ans + 1 << endl;
+        auto cur = ans.end();
+        cur--;
+
+        cout << *cur << " ";
     }
     
 }

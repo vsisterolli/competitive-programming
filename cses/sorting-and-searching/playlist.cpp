@@ -35,50 +35,26 @@ typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
 int32_t main() {
-    int n, q;
-    cin >> n >> q;
+    FAST;
+    
+    int n;
+    cin >> n;
 
-    vector<int> v(n), pos(n + 1);
-    for(int i = 0; i < n; i++) {
-        cin >> v[i];
-        pos[v[i]] = i;
-    }
+    map<int, bool> ap;
+    vector<int> v(n);
+    for(int &i : v)
+        cin >> i;
+    ap[v[0]] = 1;
 
-    int ans = 0;
-    vector<int> contributing(n+1);
-    for(int i = 2; i <= n; i++) {
-        contributing[i] = pos[i] < pos[i-1];
-        ans += contributing[i];
-    }
-
-    while(q--) {
+    int ans = 1, l = 0;
+    for(int r = 1; r < n; r++) {
         
-        int a, b;
-        cin >> a >> b;
+        while(ap[v[r]]) 
+            ap[v[l++]] = 0;
         
-        a--, b--;
-        swap(v[a], v[b]);
-        a = v[a];
-        b = v[b];
-
-        set<int> s;
-        if(a < n)
-            s.insert(a + 1);
-        if(b < n)
-            s.insert(b + 1);
-        s.insert(a); s.insert(b);
-
-        for(auto i : s)
-            ans -= contributing[i];
-
-        swap(pos[a], pos[b]);
-
-        for(auto i : s) {
-            contributing[i] = pos[i] < pos[i-1];
-            ans += contributing[i];
-        }
-
-        cout << ans + 1 << endl;
+        ap[v[r]] = 1;
+        ans = max(ans, r - l + 1);
     }
+    cout << ans << endl;
     
 }
