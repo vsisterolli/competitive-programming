@@ -34,42 +34,51 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
-int BIT[MAXN];
-int N;
-void update(int x,int val) { while(x<=N)  {  BIT[x]+=val;  x+=(x&-x);  } }
-int query(int x) {  int res=0;  while(x>0)  {  res+=BIT[x];  x-=(x&-x);  } return res; } 
-
 int32_t main() {
-    FAST;   
-    int n, k;
-    cin >> n >> k;
-    N = n;
-    for(int i = 1; i <= n; i++)
-        update(i, 1);
+    FAST;
+    int n, x;
+    cin >> n >> x;
 
-    int last = 0;
-    for(int i = 0; i < n; i++) {
-        int jump = k % (n - i);
-        int toDelete = (last + jump) % (n - i);
-        last = toDelete;
+    vector<pii> v(n);
+    map<int, int> ind;
+    map<int, vector<pii>> db;
 
-        int ini = 1, mid, end = n, ans = n;
-        while(ini <= end) {
-            int mid = (ini + end)/2;
-            int upto = query(mid);
-            upto--;
+    int aux = 1;
+    for(pii &i : v) {
+        cin >> i.f;
+        i.s = aux++;
+        ind[i.f]++;
+    }
+    sort(v.begin(), v.end());
+
+    for(int i = 0; i < n; i++)
+        for(int j = i + 1; j < n; j++)
+            db[v[i].f + v[j].f].pb({i, j});
+    
+    for(int i = 0; i < n; i++) 
+        for(int j = i+1; j < n; j++) {
+
+            int aux = x - (v[i].f + v[j].f);
+            if(aux <= 0)
+                break;
+
+            vector<pii> *v2 = &db[aux];    
+            int kek = (*v2).size();
+            if(kek == 0)
+                continue;
+
+            int aux2 = aux - v[i].f, aux3 = aux - v[j].f;
             
-            if(upto < toDelete) 
-                ini = mid + 1;
-            else if(upto >= toDelete) {
-                end = mid - 1;
-                if(upto == toDelete)
-                    ans = min(ans, mid);
+
+            if(kek - (ind[aux2] - (aux2 == v[i].f)) - (ind[aux3] - (aux3 == v[j].f) - (aux3 == v[i].f)) > 0) {
+                
+                for(pii k : *v2) 
+                    if(k.f != i && k.f != j && k.s != i && k.s != j && k.f != k.s) {
+                        cout << v[i].s << " " << v[j].s << " " << v[k.f].s << " " << v[k.s].s << endl;
+                        return 0;
+                    }
             }
         }
+    cout << "IMPOSSIBLE" << endl;
         
-        cout << ans << " ";
-        update(ans, -1);
-    }
-
 }

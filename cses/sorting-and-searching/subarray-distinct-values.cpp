@@ -28,48 +28,40 @@ freopen((s+".out").c_str( ),"w",stdout);
 }
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
+#define int long long
 typedef pair<int, string> pis;
 const ll mod = 998244353, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
-int BIT[MAXN];
-int N;
-void update(int x,int val) { while(x<=N)  {  BIT[x]+=val;  x+=(x&-x);  } }
-int query(int x) {  int res=0;  while(x>0)  {  res+=BIT[x];  x-=(x&-x);  } return res; } 
-
 int32_t main() {
-    FAST;   
+    FAST;
     int n, k;
     cin >> n >> k;
-    N = n;
-    for(int i = 1; i <= n; i++)
-        update(i, 1);
+    vector<int> v(n);
+    for(int &i : v)
+        cin >> i;
+    
+    map<int, int> mapa;
+    int l = 0, r = 0, ans = 0;
 
-    int last = 0;
-    for(int i = 0; i < n; i++) {
-        int jump = k % (n - i);
-        int toDelete = (last + jump) % (n - i);
-        last = toDelete;
+    mapa[v[l]]++;
+    k--;
 
-        int ini = 1, mid, end = n, ans = n;
-        while(ini <= end) {
-            int mid = (ini + end)/2;
-            int upto = query(mid);
-            upto--;
-            
-            if(upto < toDelete) 
-                ini = mid + 1;
-            else if(upto >= toDelete) {
-                end = mid - 1;
-                if(upto == toDelete)
-                    ans = min(ans, mid);
-            }
+    while(l < n) {
+        while(r + 1 < n && ( (mapa[v[r + 1]]) || (!mapa[v[r + 1]] && k)) )  {
+            r++;
+            if(!mapa[v[r]]) k--;
+            mapa[v[r]]++;
         }
-        
-        cout << ans << " ";
-        update(ans, -1);
-    }
+        ans += r - l + 1;
 
+        mapa[v[l]]--;
+        if(!mapa[v[l]])
+            k++;
+        l++;
+    }
+    cout << ans << endl;
 }
+    

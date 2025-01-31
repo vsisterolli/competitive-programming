@@ -29,47 +29,48 @@ freopen((s+".out").c_str( ),"w",stdout);
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 998244353, MAXN = 2e5 + 5;
+const ll mod = 998244353, MAXN = 4e5 + 5;
 typedef vector<int> vi;
-typedef pair<int, pair<int, int>> piii;
+typedef pair<pair<int, int>, int> piii;
 // END HEADER
-
-int BIT[MAXN];
-int N;
-void update(int x,int val) { while(x<=N)  {  BIT[x]+=val;  x+=(x&-x);  } }
-int query(int x) {  int res=0;  while(x>0)  {  res+=BIT[x];  x-=(x&-x);  } return res; } 
 
 int32_t main() {
     FAST;   
-    int n, k;
-    cin >> n >> k;
-    N = n;
-    for(int i = 1; i <= n; i++)
-        update(i, 1);
+    int n;
+    cin >> n;
 
-    int last = 0;
-    for(int i = 0; i < n; i++) {
-        int jump = k % (n - i);
-        int toDelete = (last + jump) % (n - i);
-        last = toDelete;
+    vector<piii> v(n);
+    int aux = 0;
+    for(piii &i : v) {
+        cin >> i.f.f >> i.f.s;
+        i.s = aux++;
+    }
+    sort(v.begin(), v.end());
 
-        int ini = 1, mid, end = n, ans = n;
-        while(ini <= end) {
-            int mid = (ini + end)/2;
-            int upto = query(mid);
-            upto--;
-            
-            if(upto < toDelete) 
-                ini = mid + 1;
-            else if(upto >= toDelete) {
-                end = mid - 1;
-                if(upto == toDelete)
-                    ans = min(ans, mid);
-            }
+    multiset<int> rooms;
+    vector<int> ans(n);
+    map<int, set<int>> mapa;
+
+    for(piii &i : v) {
+        auto lbs = rooms.lb(i.f.f);
+        if(lbs == rooms.begin()) {
+            rooms.insert(i.f.s);
+            ans[i.s] = rooms.size();
+            if(!mapa[i.f.s].size())
+                mapa[i.f.s] = {};
+            mapa[i.f.s].insert(rooms.size());
+            continue;
         }
-        
-        cout << ans << " ";
-        update(ans, -1);
+        lbs--;
+        ans[i.s] = *mapa[*lbs].begin();
+        mapa[*lbs].erase(mapa[*lbs].begin());
+        rooms.erase(lbs);
+
+        mapa[i.f.s].insert(ans[i.s]);
+        rooms.insert(i.f.s);
     }
 
+    cout << rooms.size() << endl;
+    for(int &i : ans)
+        cout << i << " ";
 }

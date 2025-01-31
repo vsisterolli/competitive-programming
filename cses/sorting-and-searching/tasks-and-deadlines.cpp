@@ -29,47 +29,27 @@ freopen((s+".out").c_str( ),"w",stdout);
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 998244353, MAXN = 2e5 + 5;
+const ll mod = 998244353, MAXN = 4e5 + 5;
 typedef vector<int> vi;
-typedef pair<int, pair<int, int>> piii;
+typedef pair<pair<int, int>, int> piii;
 // END HEADER
 
-int BIT[MAXN];
-int N;
-void update(int x,int val) { while(x<=N)  {  BIT[x]+=val;  x+=(x&-x);  } }
-int query(int x) {  int res=0;  while(x>0)  {  res+=BIT[x];  x-=(x&-x);  } return res; } 
-
 int32_t main() {
-    FAST;   
-    int n, k;
-    cin >> n >> k;
-    N = n;
-    for(int i = 1; i <= n; i++)
-        update(i, 1);
+//    FAST;   
+    int n;
+    cin >> n;
 
-    int last = 0;
-    for(int i = 0; i < n; i++) {
-        int jump = k % (n - i);
-        int toDelete = (last + jump) % (n - i);
-        last = toDelete;
+    vector<pii> v(n);
+    for(pii &i : v)
+        cin >> i.f >> i.s;
 
-        int ini = 1, mid, end = n, ans = n;
-        while(ini <= end) {
-            int mid = (ini + end)/2;
-            int upto = query(mid);
-            upto--;
-            
-            if(upto < toDelete) 
-                ini = mid + 1;
-            else if(upto >= toDelete) {
-                end = mid - 1;
-                if(upto == toDelete)
-                    ans = min(ans, mid);
-            }
-        }
-        
-        cout << ans << " ";
-        update(ans, -1);
+    sort(v.begin(), v.end());
+
+    ll ans = 0, x = 0;
+    for(pii &i : v) {
+        ans += i.s - (i.f + x);
+        x += i.f;
     }
+    cout << ans << endl;
 
 }

@@ -34,42 +34,43 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
-int BIT[MAXN];
-int N;
-void update(int x,int val) { while(x<=N)  {  BIT[x]+=val;  x+=(x&-x);  } }
-int query(int x) {  int res=0;  while(x>0)  {  res+=BIT[x];  x-=(x&-x);  } return res; } 
-
 int32_t main() {
-    FAST;   
-    int n, k;
-    cin >> n >> k;
-    N = n;
-    for(int i = 1; i <= n; i++)
-        update(i, 1);
+    FAST;
+    int n;
+    cin >> n;
 
-    int last = 0;
+    vector<pii> v(n);
+    vector<int> ans(n);   
     for(int i = 0; i < n; i++) {
-        int jump = k % (n - i);
-        int toDelete = (last + jump) % (n - i);
-        last = toDelete;
-
-        int ini = 1, mid, end = n, ans = n;
-        while(ini <= end) {
-            int mid = (ini + end)/2;
-            int upto = query(mid);
-            upto--;
-            
-            if(upto < toDelete) 
-                ini = mid + 1;
-            else if(upto >= toDelete) {
-                end = mid - 1;
-                if(upto == toDelete)
-                    ans = min(ans, mid);
-            }
-        }
-        
-        cout << ans << " ";
-        update(ans, -1);
+        cin >> v[i].f;
+        v[i].s = i;
     }
 
+    sort(v.begin(), v.end());
+
+    set<int> aux;
+    vector<int> kappa;
+    for(int i = 0; i < n; i++) {
+        auto kek = aux.lb(v[i].s);
+
+        if(kek == aux.begin()) 
+            ans[v[i].s] = -1;
+        else {
+            kek--;
+            ans[v[i].s] = *kek;
+        }
+
+        kappa.pb(v[i].s);
+        if(i + 1 < n && v[i].f != v[i + 1].f) {
+            for(int &i : kappa)
+                aux.insert(i);
+            kappa.clear();
+        }
+
+
+    }
+
+    for(int &i : ans)
+        cout << i + 1 << " ";
 }
+    
