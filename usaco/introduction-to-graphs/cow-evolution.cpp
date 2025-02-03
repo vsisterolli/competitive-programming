@@ -20,6 +20,7 @@
 #define left esquerda
 #define lb lower_bound
 #define right direita
+#define int long long
 using namespace std;
 void setIO(string s) {
 ios_base::sync_with_stdio(0); cin.tie(0);
@@ -28,41 +29,58 @@ freopen((s+".out").c_str( ),"w",stdout);
 }
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
-#define int long long
 typedef pair<int, string> pis;
-const ll mod = 998244353, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
+
 int32_t main() {
-    FAST;
-    int n, k;
-    cin >> n >> k;
-    vector<int> v(n);
-    for(int &i : v)
-        cin >> i;
-    
-    map<int, int> mapa;
-    int l = 0, r = 0, ans = 0;
 
-    mapa[v[l]]++;
-    k--;
-    
+    setIO("evolution");
+    int n;
+    cin >> n;
 
-    while(l < n) {
-        while(r + 1 < n && ( (mapa[v[r + 1]]) || (!mapa[v[r + 1]] && k)) )  {
-            r++;
-            if(!mapa[v[r]]) k--;
-            mapa[v[r]]++;
+    map<string, vector<int>> mapa;
+    map<int, string> sbt;
+
+    for(int i = 0; i < n; i++) {
+        int q;
+        cin >> q;
+        while(q--) {
+            string s;
+            cin >> s;
+            mapa[s].pb(i);
         }
-        ans += r - l + 1;
-
-        mapa[v[l]]--;
-        if(!mapa[v[l]])
-            k++;
-        l++;
     }
-    cout << ans << endl;
-}
+
+    vector<pair<int, string>> szs;
+    for(auto i : mapa)
+        szs.pb({i.s.size(), i.f});
     
+    sort(szs.begin(), szs.end(), greater<pair<int, string>>());
+    
+    for(auto i : szs) {
+        
+        string cur = i.s;
+        
+        string sbtc = sbt[mapa[cur][0]];
+        bool flag = true;
+        for(auto j : mapa[cur]) {
+            if(sbtc != sbt[j])
+                flag = false;
+            sbt[j] = cur;
+        }
+
+        if(!flag) {
+            cout << "no" << endl;
+            return 0;
+        }
+
+
+    }
+
+    cout << "yes" << endl;
+}
+

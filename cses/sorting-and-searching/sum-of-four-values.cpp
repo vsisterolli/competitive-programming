@@ -53,7 +53,7 @@ int32_t main() {
 
     for(int i = 0; i < n; i++)
         for(int j = i + 1; j < n; j++)
-            db[v[i].f + v[j].f].pb({i, j});
+                db[v[i].f + v[j].f].pb({i, j});
     
     for(int i = 0; i < n; i++) 
         for(int j = i+1; j < n; j++) {
@@ -82,3 +82,4 @@ int32_t main() {
     cout << "IMPOSSIBLE" << endl;
         
 }
+    

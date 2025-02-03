@@ -20,6 +20,7 @@
 #define left esquerda
 #define lb lower_bound
 #define right direita
+#define int long long
 using namespace std;
 void setIO(string s) {
 ios_base::sync_with_stdio(0); cin.tie(0);
@@ -28,41 +29,52 @@ freopen((s+".out").c_str( ),"w",stdout);
 }
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
-#define int long long
 typedef pair<int, string> pis;
-const ll mod = 998244353, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
+
 int32_t main() {
-    FAST;
-    int n, k;
-    cin >> n >> k;
-    vector<int> v(n);
-    for(int &i : v)
-        cin >> i;
-    
-    map<int, int> mapa;
-    int l = 0, r = 0, ans = 0;
 
-    mapa[v[l]]++;
-    k--;
-    
+    setIO("race");
+    int k, q;
+    cin >> k >> q;
 
-    while(l < n) {
-        while(r + 1 < n && ( (mapa[v[r + 1]]) || (!mapa[v[r + 1]] && k)) )  {
-            r++;
-            if(!mapa[v[r]]) k--;
-            mapa[v[r]]++;
+    int gans = -1;
+    while(q--) {
+        int l;
+        cin >> l;
+
+        if(l >= gans && gans != -1) {
+            cout << gans << endl;
+            continue;
         }
-        ans += r - l + 1;
 
-        mapa[v[l]]--;
-        if(!mapa[v[l]])
-            k++;
-        l++;
+        int backup = k;
+
+        ll x = k + ((l - 1) * l)/2;
+
+        ll aux = sqrt(x);
+        k -= (1 + aux) * aux/2;
+        
+        if(gans == -1 && k < 0) {
+            while(k < 0) {
+                gans = aux;
+                aux--;
+                k = backup;
+                k -= (1 + aux) * aux/2;
+            }
+            cout << gans << endl;
+            continue;
+        }
+
+        k -= (aux + l - 1) * (aux - l)/2;
+
+        cout << aux + aux - l + ((k + aux - 1)/aux) << endl;
+
+        k = backup;
     }
-    cout << ans << endl;
 }
-    
+

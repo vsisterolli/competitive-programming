@@ -20,6 +20,7 @@
 #define left esquerda
 #define lb lower_bound
 #define right direita
+#define int long long
 using namespace std;
 void setIO(string s) {
 ios_base::sync_with_stdio(0); cin.tie(0);
@@ -28,41 +29,62 @@ freopen((s+".out").c_str( ),"w",stdout);
 }
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
-#define int long long
 typedef pair<int, string> pis;
-const ll mod = 998244353, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
+
 int32_t main() {
-    FAST;
+
+    setIO("swap");
     int n, k;
     cin >> n >> k;
+
+    int a1, a2, b1, b2;
+    cin >> a1 >> a2 >> b1 >> b2;
+
     vector<int> v(n);
-    for(int &i : v)
-        cin >> i;
-    
-    map<int, int> mapa;
-    int l = 0, r = 0, ans = 0;
+    for(int i = 0; i < n; i++)
+        v[i] = i + 1;
 
-    mapa[v[l]]++;
-    k--;
-    
+    a1--, a2--, b1--, b2--;
 
-    while(l < n) {
-        while(r + 1 < n && ( (mapa[v[r + 1]]) || (!mapa[v[r + 1]] && k)) )  {
-            r++;
-            if(!mapa[v[r]]) k--;
-            mapa[v[r]]++;
-        }
-        ans += r - l + 1;
+    int csize = 1;
 
-        mapa[v[l]]--;
-        if(!mapa[v[l]])
-            k++;
-        l++;
+    for(int i = 0; i >= 0; csize++, i++) {
+
+        for(int j = 0; a2 - j >= a1 + j; j++)
+            swap(v[a1 + j], v[a2 - j]);
+        
+        for(int j = 0; b2 - j >= b1 + j; j++)
+            swap(v[b1 + j], v[b2 - j]);
+
+        bool flag = false;
+        for(int j = 0; j < n; j++)
+            if(v[j] != j + 1) { 
+                flag = true;
+                break;
+            }
+        
+        if(!flag)
+            break;
     }
-    cout << ans << endl;
+
+    k %= csize;
+
+    for(int i = 0; i < k; i++) {
+
+        for(int j = 0; a2 - j >= a1 + j; j++)
+            swap(v[a1 + j], v[a2 - j]);
+        
+        for(int j = 0; b2 - j >= b1 + j; j++)
+            swap(v[b1 + j], v[b2 - j]);
+        
+    }
+
+    for(int &i : v)
+        cout << i << endl;
 }
-    
+

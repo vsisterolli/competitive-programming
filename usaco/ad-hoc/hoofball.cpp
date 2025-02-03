@@ -28,41 +28,48 @@ freopen((s+".out").c_str( ),"w",stdout);
 }
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
-#define int long long
 typedef pair<int, string> pis;
-const ll mod = 998244353, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 // END HEADER
 
+
 int32_t main() {
-    FAST;
-    int n, k;
-    cin >> n >> k;
+    
+    int n;
+    cin >> n;
+    
     vector<int> v(n);
     for(int &i : v)
         cin >> i;
-    
-    map<int, int> mapa;
-    int l = 0, r = 0, ans = 0;
+    sort(v.begin(), v.end());
 
-    mapa[v[l]]++;
-    k--;
-    
+    vector<char> dir;
+    dir.pb('D');
 
-    while(l < n) {
-        while(r + 1 < n && ( (mapa[v[r + 1]]) || (!mapa[v[r + 1]] && k)) )  {
-            r++;
-            if(!mapa[v[r]]) k--;
-            mapa[v[r]]++;
-        }
-        ans += r - l + 1;
-
-        mapa[v[l]]--;
-        if(!mapa[v[l]])
-            k++;
-        l++;
+    for(int i = 1; i + 1< n; i++) {
+        if(v[i] - v[i - 1] >= v[i + 1] - v[i])
+            dir.pb('D');
+        else dir.pb('E');
     }
+
+    dir.pb('E');
+
+    int prev = 0, ans = 1;
+    for(int i = 1; i < n; i++) {
+        if(dir[i] == 'E')
+            continue;
+        
+        while(dir[prev] == 'D')
+            prev++;
+
+        ans++;
+        prev = max(prev + 1, i);
+        i = prev + 1;
+    }
+
+
     cout << ans << endl;
 }
-    
+
