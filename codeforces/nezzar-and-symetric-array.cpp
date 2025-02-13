@@ -15,7 +15,7 @@
 #define debug2(x, y) cout << "DEBUG " << x << " " << y << endl
 #define debug3(x, y, z) cout << "DEBUG " << x << " " << y << " " << z<< endl
 #define debug4(x, y, z, o) cout << "DEBUG " << x << " " << y << " " << z<< " " << o << endl
-#define all(x) (x).begin(), (x).end()
+#define all(x) x.begin(), x.end()
 #define left esquerda
 #define lb lower_bound
 #define right direita
@@ -32,28 +32,55 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-bool cmp(string a, string b) {
-    return a + b < b + a;
-}
-
 void solve() {
     int n;
     cin >> n;
+    n *= 2;
 
-    vector<string> s(n);
-    for(string &i : s)
+    vector<ll> v(n), posi;
+    map<ll, int> count;
+    for(ll &i : v) {
         cin >> i;
-
-    sort(all(s), cmp);
-    for(string &i : s) {
-        cout <<i;
+        count[i]++;
     }
-    cout << endl;
+
+    for(auto &i : count) {
+        if(i.s & 1) {
+            cout << "NO" << endl;
+            return;
+        }
+
+        for(int j = 0; 2 * j < i.s; j++)
+            posi.pb(i.f);
+    }
+    sort(all(posi), greater<ll>());
+    
+    ll aux = 0, sum = 0;
+    map<ll, bool> cnt2;
+    
+    for(int i = 0; 2 * i < n; i++) {
+        if( (-posi[i] - 2 * sum) % (n - 2 * i) ) {
+            cout << "NO" << endl;
+            return;
+        }
+
+        ll ai = (-posi[i] - 2 * sum)/(n - 2 * i);
+        if(ai >= 0 || cnt2[ai]) {
+            cout << "NO" << endl;
+            return;
+        }
+
+        cnt2[ai] = 1;
+        sum += ai;
+    }
+
+    cout << "YES" << endl;
+
 }
 
 int32_t main() {
-    // setIO("mountains");
-    int ct = 1;
+    int ct = 1;    
+    cin >> ct;
     while(ct--)
         solve();
 }

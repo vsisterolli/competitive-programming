@@ -11,12 +11,13 @@
 #define fout cout
 #define s second
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
-#define debug(x) cout << "DEBUG " << x << endl
-#define debug2(x, y) cout << "DEBUG " << x << " " << y << endl
-#define debug3(x, y, z) cout << "DEBUG " << x << " " << y << " " << z<< endl
-#define debug4(x, y, z, o) cout << "DEBUG " << x << " " << y << " " << z<< " " << o << endl
-#define all(x) (x).begin(), (x).end()
+#define debug(x) cerr << "DEBUG " << x << endl
+#define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
+#define debug3(x, y, z) cerr << "DEBUG " << x << " " << y << " " << z<< endl
+#define debug4(x, y, z, o) cerr << "DEBUG " << x << " " << y << " " << z<< " " << o << endl
+#define all(x) x.begin(), x.end()
 #define left esquerda
+#define int long long
 #define lb lower_bound
 #define right direita
 using namespace std;
@@ -32,28 +33,37 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-bool cmp(string a, string b) {
-    return a + b < b + a;
-}
-
 void solve() {
     int n;
     cin >> n;
+    
+    string s;
+    cin >> s;
 
-    vector<string> s(n);
-    for(string &i : s)
-        cin >> i;
+    map<char, int> ap;
+    for(char &i : s)
+        ap[i]++;
 
-    sort(all(s), cmp);
-    for(string &i : s) {
-        cout <<i;
+    int l = 0;
+    while(l < n && ap[s[l]] > 1) {
+        ap[s[l]]--;
+        l++;
     }
-    cout << endl;
+
+    int r = n - 1;
+    while(r >= 0 && ap[s[r]] > 1) {
+        ap[s[r]]--;
+        r--;
+    }
+    
+    cout << r - l + 1 << endl;
+
 }
 
 int32_t main() {
-    // setIO("mountains");
-    int ct = 1;
+    // setIO("meetings");
+    int ct = 1;    
+    // cin >> ct;
     while(ct--)
         solve();
 }

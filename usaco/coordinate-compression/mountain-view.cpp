@@ -20,6 +20,7 @@
 #define lb lower_bound
 #define right direita
 #define int long long
+
 using namespace std;
 void setIO(string s) {
 ios_base::sync_with_stdio(0); cin.tie(0);

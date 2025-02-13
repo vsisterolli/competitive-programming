@@ -109,7 +109,8 @@ void solve() {
 }
 
 int32_t main() {
-    setIO("split");
+    setIO("split
+        ");
     int ct = 1;
     while(ct--)
         solve();
