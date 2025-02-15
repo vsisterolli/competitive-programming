@@ -34,56 +34,44 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n;
-    cin >> n;
-    
-    string s;
-    cin >> s;
+    int n, k;
+    cin >> n >> k;
 
-    map<char, int> ap;
+    vector<int> v(n);
+    for(int &i : v)
+        cin >> i;
+    sort(all(v));
 
-    int tot = 0;
-    for(char &i : s) {
-        tot += !(ap[i]);
-        ap[i]++;
-    }
-    for(char &i : s)
-        ap[i] = 0;
 
-    int tottot = tot;
-    tot = 0;
+    int ans = 0;
+    int best[n];
 
-    int l = -1, r = 0, ans = n;
-    while(l + 1 < n) {
+    int last = 0;
+    for(int i = 0; i < n; i++) {
+        while(v[i] - v[last] > k)
+            last++;
         
-        if(l >= 0) {
-            char i = s[l];
-            if(ap[i] == 1) 
-                tot--;
-            ap[i]--;
-        }
-        l++;
-
-        while(r < n && tot < tottot) {
-            char i = s[r];
-            if(!ap[i])
-                tot++;
-            ap[i]++;
-            r++;
-        }
-
-        if(tot == tottot)
-            ans = min(r - l, ans);
-
+        best[i] = i - last + 1;
+        if(i)
+            best[i] = max(best[i], best[i - 1]);
+    }
+    
+    last = 1;
+    for(int i = 1; i < n; i++) {
+        while(v[i] - v[last] > k)
+            last++;
+        
+        ans = max(ans, best[last - 1] + i - last + 1);
     }
 
-    
+
+
     cout << ans << endl;
 
 }
 
 int32_t main() {
-    // setIO("meetings");
+    setIO("diamond");
     int ct = 1;    
     // cin >> ct;
     while(ct--)

@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -33,91 +34,135 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+typedef struct Cow {
+    int w, x, d;
+    Cow() {};
+    
+    bool operator<(Cow &a) {
+        return x < a.x;
+    }
+} Cow;
+
 void solve() {
     int n, S, sum = 0;
     cin >> n >> S;
 
-    vector<int> w(n), x(n), d(n);
-    for(int i = 0; i < n; sum += w[i], i++)
-        cin >> w[i] >> x[i] >> d[i];
+    vector<Cow> cow(n);
+    for(int i = 0; i < n; sum += cow[i].w, i++) 
+        cin >> cow[i].w >> cow[i].x >> cow[i].d;
+    sort(all(cow));
 
-    vector<int> order(n);
-    iota(order.begin(), order.end(), 0);
 
-    sort(all(order), [&](int a, int b) -> bool {
-        return x[a] < x[b];
-    });
-
-    map<int, int> T, colision;
-    int *l = &order[0], *r = &order[n-1];
-
-    while(l <= r && d[*l] == -1) {
-        T[2 * x[*l]] += w[*l];
+    vector<pii> tw(n);
+    int l = 0, r = n-1;
+    while(l <= r && cow[l].d == -1) {
+        tw[l] = {cow[l].x, cow[l].w};
         l++;
     }
 
-    while(l <= r && d[*r] == 1) {
-        T[2 * (S - x[*r])] += w[*r];
+    while(l <= r && cow[r].d == 1) {
+        tw[r] = {S - cow[r].x, cow[r].w};
         r--;
     }
 
-    vector<int> time_colision(n);
-    while(l <= r) {
-        int *aux = l + 1;
+    set<int> gl, gr;
+    for(int i = l; i <= r; i++) {
+        if(cow[i].d == -1)
+            gl.insert(i);
+        else
+            gr.insert(i);
+    }
 
-        while(aux <= r && d[*aux] != -1)
-            aux++;
+    for(int i = l; i <= r; i++) {
+        if(cow[i].d == -1)
+            continue;
 
-        if(aux > r) {
+        auto aux = gl.upper_bound(i);
+        if(aux == gl.end()) {
 
-            while(l <= r) {
-                T[time_colision[*l] + 2 * (S - x[*l])] += w[*l];
-                l++;
-            }
-            break;
+            auto aux2 = gr.lower_bound(i);
+            aux2--;
 
-        }
 
-        while(aux > l && aux <= r && d[*aux] == -1) {
-            int ctime = time_colision[*aux];
-            ctime += x[*aux] - x[*(aux - 1)];
+            int time = (cow[*aux2].d == 1 ? S - cow[*aux2].x : cow[*aux2].x);
+            tw[*aux2] = {time, cow[i].w};
             
-            int c_position = x[*(aux - 1)] + (x[*aux] - x[*(aux - 1)])/2;
-            debug(*l);
-            debug4(ctime, c_position, *aux, *(aux - 1));
+            gr.erase(aux2);
+        }
+        else {
+            int time = (cow[*aux].d == 1 ? S - cow[*aux].x : cow[*aux].x);
+            // debug3(i, *aux, time);
 
-
-            colision[ctime]++;
-            d[*aux] = 1;
-            d[*(aux - 1)] = -1;
+            tw[*aux] = {time, cow[i].w};
         
-            x[*aux] = c_position;
-            x[*(aux - 1)] = c_position;
-            if( (x[*aux] - x[*(aux - 1)]) & 1 )
-                x[*aux]++;
+            gl.erase(aux);
+        }
+    }
+
+    // debug2(l, r);
+    for(int i = r; i >= l; i--) {
+        if(cow[i].d == 1)
+            continue;
+        
+        auto aux = gr.lower_bound(i);
+        if(aux == gr.begin()) {
+            auto aux2 = gl.upper_bound(i);            
+            int time = (cow[*aux2].d == 1 ? S - cow[*aux2].x : cow[*aux2].x);
+
+            tw[*aux2] = {time, cow[i].w};
             
-            time_colision[*aux] = time_colision[*(aux - 1)] = ctime;
+            gl.erase(aux2);
+        }
+        else {
             aux--;
-        }
+            int time = (cow[*aux].d == 1 ? S - cow[*aux].x : cow[*aux].x);
+            // debug3(i, *aux, time);
 
-        T[ (2 * x[*l]) + time_colision[*l]] += w[*l];
-        l++;
-
-    }
-
-    int total = 0;
-    for(auto &i : T) {
-        total += i.s;
-        if(2 * total >= sum) {
-            int ans = 0;
-            for(auto j : colision)
-                ans += (j.f <= i.f);
-            cout << ans << endl;
-            return;   
+            tw[*aux] = {time, cow[i].w};
+        
+            gr.erase(aux);
         }
     }
 
+    sort(all(tw));
 
+    int cur = 0, at = 0;
+    for(pii &i : tw) {
+        cout << "TIME " << i.f << " WEIGHT " << i.s << endl;
+        // debug3("Hi", i.f, i.s);
+        cur += i.s;
+        // debug2(cur, sum);
+        if(cur * 2 >= sum) {
+            at = i.f;
+            break;
+        }
+    }
+    // debug(at);
+
+    int lp = l - 1, rp = l;
+
+    int cnt = 0, ans = 0;
+    debug(at);
+    while(lp <= r) {
+        // debug2(lp, rp);
+        if(lp >= l) {
+            
+            if(cow[lp].d == -1) 
+                cnt--;
+            else 
+                ans += cnt;
+
+        }
+        lp++;
+
+        while(rp <= r && (cow[rp].x - cow[lp].x) <= 2 * at) {
+            if(cow[rp].d == -1) 
+                cnt++;
+            rp++;
+        }
+    
+    }
+    cout << ans << endl;
 }
 
 int32_t main() {

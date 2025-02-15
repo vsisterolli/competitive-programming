@@ -36,54 +36,29 @@ typedef pair<int, pair<int, int>> piii;
 void solve() {
     int n;
     cin >> n;
+
+    vector<int> v(n);
+    for(int &i : v)
+        cin >> i;
+    sort(all(v));
+
+    int l = 0, r = 0;
     
-    string s;
-    cin >> s;
-
-    map<char, int> ap;
-
-    int tot = 0;
-    for(char &i : s) {
-        tot += !(ap[i]);
-        ap[i]++;
-    }
-    for(char &i : s)
-        ap[i] = 0;
-
-    int tottot = tot;
-    tot = 0;
-
-    int l = -1, r = 0, ans = n;
-    while(l + 1 < n) {
-        
-        if(l >= 0) {
-            char i = s[l];
-            if(ap[i] == 1) 
-                tot--;
-            ap[i]--;
-        }
-        l++;
-
-        while(r < n && tot < tottot) {
-            char i = s[r];
-            if(!ap[i])
-                tot++;
-            ap[i]++;
+    int mxans = 0, mnans = n;
+    while(l < n) {
+        while(r < n && v[r] - v[l] < n)
             r++;
-        }
 
-        if(tot == tottot)
-            ans = min(r - l, ans);
-
+        mnans = min(mnans, n - (r - l));
+        l++;
     }
 
-    
-    cout << ans << endl;
-
+    mxans = max(v[n - 2] - v[0], v[n - 1] - v[1]) - (n - 2);
+    cout << mnans << endl << mxans << endl;
 }
 
 int32_t main() {
-    // setIO("meetings");
+    setIO("herding");
     int ct = 1;    
     // cin >> ct;
     while(ct--)

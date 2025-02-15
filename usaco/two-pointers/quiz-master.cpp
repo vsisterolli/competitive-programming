@@ -17,7 +17,6 @@
 #define debug4(x, y, z, o) cerr << "DEBUG " << x << " " << y << " " << z<< " " << o << endl
 #define all(x) x.begin(), x.end()
 #define left esquerda
-#define int long long
 #define lb lower_bound
 #define right direita
 using namespace std;
@@ -32,60 +31,76 @@ typedef pair<int, string> pis;
 const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
+using namespace __gnu_pbds;
+template <class K, class V>
+using ht =
+    gp_hash_table<K, V, hash<K>, equal_to<K>, direct_mask_range_hashing<>,
+                  linear_probe_fn<>,
+                  hash_standard_resize_policy<hash_exponential_size_policy<>,
+                                              hash_load_check_resize_trigger<>, true>>;
+
+vector<int> factors[MAXN];
+
+void get() {
+    for(int i = 1; i < MAXN; i++)
+        for(int j = i; j < MAXN; j+= i)
+            factors[j].pb(i);
+}
 
 void solve() {
-    int n;
-    cin >> n;
-    
-    string s;
-    cin >> s;
+    int n, m;
+    cin >> n >> m;
 
-    map<char, int> ap;
+    vector<int> a(n);
+    for(int &i : a)
+        cin >> i;
+    sort(all(a));
 
-    int tot = 0;
-    for(char &i : s) {
-        tot += !(ap[i]);
-        ap[i]++;
-    }
-    for(char &i : s)
-        ap[i] = 0;
+    int l = -1, r = 0, tot = 0, ans = a[n - 1] + 1;
+    vector<int> cont(m + 5);
 
-    int tottot = tot;
-    tot = 0;
-
-    int l = -1, r = 0, ans = n;
     while(l + 1 < n) {
         
         if(l >= 0) {
-            char i = s[l];
-            if(ap[i] == 1) 
-                tot--;
-            ap[i]--;
+
+            for(int &i : factors[a[l]]) {
+                if(i > m)
+                    break;
+                if(cont[i] == 1) 
+                    tot--;
+                cont[i]--;
+            }
+
         }
         l++;
 
-        while(r < n && tot < tottot) {
-            char i = s[r];
-            if(!ap[i])
-                tot++;
-            ap[i]++;
+        while(r < n && tot < m) {
+
+            for(int &i : factors[a[r]]) {
+                if(i > m)
+                    break;
+                if(!cont[i])
+                    tot++;
+                cont[i]++;
+            }
             r++;
+
         }
 
-        if(tot == tottot)
-            ans = min(r - l, ans);
+        if(tot == m)
+            ans = min(a[r - 1] - a[l], ans);
 
     }
-
-    
-    cout << ans << endl;
+    cout << (ans == a[n - 1] + 1 ? -1 : ans) << endl;
 
 }
 
 int32_t main() {
     // setIO("meetings");
+    FAST;
+    get();
     int ct = 1;    
-    // cin >> ct;
+    cin >> ct;
     while(ct--)
         solve();
 }
