@@ -33,70 +33,78 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+ll modExpo(ll a, ll b) {
+    if(b == 0)
+        return 1;
+    if(b == 1)
+        return a;
+    
+    ll prod = modExpo(a, b >> 1);
+
+    prod = (prod * prod) % mod;
+
+    if(b & 1)
+        prod = (prod * a) % mod;
+
+    return prod; 
+}
+
 void solve() {
     int n;
     cin >> n;
-
-    vector<pii> v(n);
-
-    set<int> ls;
-    for(pii &i : v) {
-        cin >> i.f >> i.s;
-        ls.insert(i.f);
-    }
-
-    vector<int> compress;
-    copy(all(ls), back_inserter (compress));
-
-    map<int, int> cmp;
-    for(int i = 0; i < compress.size(); i++)  
-        cmp[compress[i]] = i;
+    vector<int> v(n);
+    for(int i = 0; i < n; i++)
+        cin >> v[i];
     
+    sort(all(v));
 
-    vector<int> pos[compress.size()];
-    for(int i = 0; i < n; i++) 
-        pos[cmp[v[i].f]].push_back(v[i].s);
     
-    int cur = compress[0];
-    
-    priority_queue<int, vector<int>, greater<int>> mr;
-    for(int i = 0; i < compress.size(); i++)  {
+    ll toSum = 0;
+    sort(all(v));
+
+    while(n) {
+
         
-        cur = compress[i];
-        for(int &j : pos[i]) 
-            mr.push(j);
+        int x = v[0];
+        for(int i = 0; i < n; i++)
+            v[i] -= x;
         
-        while(!mr.empty() && (i + 1 < compress.size() && cur < compress[i + 1])) {
+        toSum = (toSum + (x * modExpo(2, n - 1)) % mod)%mod;
 
-            if(cur > mr.top()) {
-                cout << "No" << endl;
-                return;
-            }
-            cur++;
-            mr.pop();
+        priority_queue<piii, vector<piii>, greater<piii>> fila;
+
+        for(int i = 0; i + 1 < n; i++) 
+            fila.push({v[i] + v[i + 1], {i, i + 1}});
+    
+        vector<int> v2;
+
+        for(int i = 0; i + 1 < n; i++) {
+            piii cur = fila.top();
+            fila.pop();
+            
+            v2.pb(cur.f);
+            cur.s.s++;
+
+            if(cur.s.s < n)
+                fila.push({v[cur.s.f] + v[cur.s.s], {cur.s.f, cur.s.s}});
 
         }
 
-    }
+        v = v2;
 
-
-    while(!mr.empty()) {
-
-        if(cur > mr.top()) {
-            cout << "No" << endl;
+        if(n == 1) {
+            cout << (v[0] + toSum) % mod << endl;
             return;
         }
-        cur++;
-        mr.pop();
-
+        n--;
     }
-
-    cout << "Yes" << endl;
-}    
+    
+}
 
 int32_t main() {
+    FAST;
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

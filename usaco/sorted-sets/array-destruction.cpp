@@ -34,65 +34,70 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
+    
     int n;
     cin >> n;
+    n *= 2;
 
-    vector<pii> v(n);
+    vector<int> v(n);
+    multiset<int> s;
 
-    set<int> ls;
-    for(pii &i : v) {
-        cin >> i.f >> i.s;
-        ls.insert(i.f);
+    int max = 0;
+    for(int i = 0; i < n; i++) {
+        cin >> v[i];
+        if(v[i] > v[max])
+            max = i;
     }
 
-    vector<int> compress;
-    copy(all(ls), back_inserter (compress));
 
-    map<int, int> cmp;
-    for(int i = 0; i < compress.size(); i++)  
-        cmp[compress[i]] = i;
-    
+    for(int i = 0; i < n; i++) {
+            
+        if(i == max)
+            continue;
 
-    vector<int> pos[compress.size()];
-    for(int i = 0; i < n; i++) 
-        pos[cmp[v[i].f]].push_back(v[i].s);
-    
-    int cur = compress[0];
-    
-    priority_queue<int, vector<int>, greater<int>> mr;
-    for(int i = 0; i < compress.size(); i++)  {
-        
-        cur = compress[i];
-        for(int &j : pos[i]) 
-            mr.push(j);
-        
-        while(!mr.empty() && (i + 1 < compress.size() && cur < compress[i + 1])) {
+        s.clear();
+        for(int j = 0; j < n; j++)
+            s.insert(v[j]); 
 
-            if(cur > mr.top()) {
-                cout << "No" << endl;
-                return;
+        int xi = v[i] + v[max];
+
+        vector<pii> ans;
+
+        int x = xi;
+        bool flag = true;
+        while(!s.empty()) {
+            auto r = s.end();
+            r--;
+            
+            auto l = s.find(x - *r);
+            int kek1 = *r, kek2 = *l;
+            // debug4(xi, x, kek1, kek2);
+            // debug(s.size());
+            if(l == s.end() || l == r) {
+                flag = false;
+                break;
             }
-            cur++;
-            mr.pop();
 
+            ans.pb({*l, *r});
+            x = *r;
+
+            s.erase(s.find(kek1));
+            s.erase(s.find(kek2));
         }
-
-    }
-
-
-    while(!mr.empty()) {
-
-        if(cur > mr.top()) {
-            cout << "No" << endl;
+        
+        if(flag) {
+            cout << "YES" << endl << xi << endl;
+            for(pii &j: ans) 
+                cout << j.f << " " << j.s << endl;
             return;
         }
-        cur++;
-        mr.pop();
 
     }
 
-    cout << "Yes" << endl;
-}    
+    cout << "NO" << endl;
+    
+
+}
 
 int32_t main() {
     int ct = 1;

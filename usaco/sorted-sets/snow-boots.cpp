@@ -34,69 +34,80 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n;
-    cin >> n;
+    int n, b;
+    cin >> n >> b;
 
-    vector<pii> v(n);
+    vector<int> f(n);
 
-    set<int> ls;
-    for(pii &i : v) {
-        cin >> i.f >> i.s;
-        ls.insert(i.f);
+    set<int> un;
+    for(int &i : f) {
+        cin >> i;
+        un.insert(i);
     }
 
+    vector<pii> bts(b);
+    for(pii &i : bts) {
+        cin >> i.f >> i.s;
+        un.insert(i.f);
+    }
     vector<int> compress;
-    copy(all(ls), back_inserter (compress));
+    for(auto i : un)
+        compress.pb(i);
+
 
     map<int, int> cmp;
-    for(int i = 0; i < compress.size(); i++)  
+    for(int i = 0; i < compress.size(); i++) 
         cmp[compress[i]] = i;
     
-
-    vector<int> pos[compress.size()];
-    for(int i = 0; i < n; i++) 
-        pos[cmp[v[i].f]].push_back(v[i].s);
     
-    int cur = compress[0];
+    vector<int> pos[compress.size()], ans(compress.size());
     
-    priority_queue<int, vector<int>, greater<int>> mr;
-    for(int i = 0; i < compress.size(); i++)  {
-        
-        cur = compress[i];
-        for(int &j : pos[i]) 
-            mr.push(j);
-        
-        while(!mr.empty() && (i + 1 < compress.size() && cur < compress[i + 1])) {
+    for(int i = 0; i < n; i++) {
+        f[i] = cmp[f[i]];
+        pos[f[i]].pb(i);
+    }
+    
+    for(int i = 0; i < b; i++)
+        bts[i].f = cmp[bts[i].f];
+    
+    set<int> curpos;
+    multiset<int> dists;
 
-            if(cur > mr.top()) {
-                cout << "No" << endl;
-                return;
-            }
-            cur++;
-            mr.pop();
+    curpos.insert(0);
+    curpos.insert(n - 1);
 
+    dists.insert(n - 1);
+    for(int i = 0; i < compress.size(); i++) {
+        for(int &j : pos[i]) {
+            if(j == 0 || j == n - 1)
+                continue;
+
+            curpos.insert(j);
+            auto aux = curpos.upper_bound(j);
+            dists.insert(*aux - j);
+
+            auto aux2 = curpos.lower_bound(j);
+            aux2--;
+
+            dists.insert(j - *aux2);
+            dists.erase(dists.find(*aux - *aux2));
         }
+        
+        auto curans = dists.end();
+        curans--;
+        ans[i] = *curans;
 
     }
 
+    for(int i = 0; i < b; i++)
+        cout << (bts[i].s >= ans[bts[i].f]) << endl;
 
-    while(!mr.empty()) {
-
-        if(cur > mr.top()) {
-            cout << "No" << endl;
-            return;
-        }
-        cur++;
-        mr.pop();
-
-    }
-
-    cout << "Yes" << endl;
-}    
+}
 
 int32_t main() {
+    setIO("snowboots");
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

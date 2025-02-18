@@ -36,67 +36,42 @@ typedef pair<int, pair<int, int>> piii;
 void solve() {
     int n;
     cin >> n;
+    
+    map<ll, int> mapa, ans;
 
-    vector<pii> v(n);
-
-    set<int> ls;
-    for(pii &i : v) {
-        cin >> i.f >> i.s;
-        ls.insert(i.f);
+    int cnt = 0;
+    while(cnt++ < n) {
+        ll l, r;
+        cin >> l >> r;
+        
+        mapa[l]++;
+        mapa[r + 1]--;
     }
 
-    vector<int> compress;
-    copy(all(ls), back_inserter (compress));
-
-    map<int, int> cmp;
-    for(int i = 0; i < compress.size(); i++)  
-        cmp[compress[i]] = i;
+    auto i = mapa.begin();
     
+    auto cur = mapa.begin();
+    cur++;
 
-    vector<int> pos[compress.size()];
-    for(int i = 0; i < n; i++) 
-        pos[cmp[v[i].f]].push_back(v[i].s);
-    
-    int cur = compress[0];
-    
-    priority_queue<int, vector<int>, greater<int>> mr;
-    for(int i = 0; i < compress.size(); i++)  {
-        
-        cur = compress[i];
-        for(int &j : pos[i]) 
-            mr.push(j);
-        
-        while(!mr.empty() && (i + 1 < compress.size() && cur < compress[i + 1])) {
-
-            if(cur > mr.top()) {
-                cout << "No" << endl;
-                return;
-            }
-            cur++;
-            mr.pop();
-
-        }
-
-    }
+    int tot = (*i).s;
+    while(cur != mapa.end()) {
+        ans[tot] += (*cur).f - (*i).f;
+        tot += (*cur).s;
 
 
-    while(!mr.empty()) {
-
-        if(cur > mr.top()) {
-            cout << "No" << endl;
-            return;
-        }
         cur++;
-        mr.pop();
-
+        i++;
     }
 
-    cout << "Yes" << endl;
-}    
+    for(int i = 1; i <= n; i++)
+        cout << ans[i] << " ";
+    cout << endl;
+
+}
 
 int32_t main() {
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;
