@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -29,63 +28,61 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 1e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int n, k;
-int v[MAXN];
-
 
 void solve() {
-    cin >> n >> k;
-    for(int i = 0; i < n; i++)
-        cin >> v[i];
-    sort(v, v + n);
+    int n;
+    cin >> n;
+
+    vector<int> v(n), c(n);
+    for(int &i : v)
+        cin >> i;
+    for(int &i : c)
+        cin >> i;
     
-    int l = 0, r = n - 1;
-   
-    while(k && l < r) {
-        while(l + 1 < r && v[l] == v[l + 1])
-            l++;
-        while(r - 1 >= l && v[r] == v[r - 1])
-            r--;
+    vector<ll> b[MAXN];
+    for(int i = 0; i < n; i++)
+        b[c[i]].pb(v[i]);
+    for(int i = 0; i < MAXN; i++)
+        for(int j = 1; j < b[i].size(); j++)
+            b[i][j] += b[i][j - 1];
 
-        if(l == r)
-            break;
-        
-        int toRight = (n - 1) - r + 1;
-        if(l + 1 <= toRight) {
-            
-            if( (l + 1) * (v[l + 1] - v[l]) <= k) {
-                k -= (l + 1) * (v[l + 1] - v[l]);
-                l++;
-            }
+    int q;
+    cin >> q;
 
-            else {
-                v[l] += k/(l + 1);
-                k = 0;
-            }
-        
+    ll toSum = 0;
+    vector<ll> toRmv(MAXN);
+    
+    while(q--) {
+        int type, color;
+        ll x;
+        cin >> type >> color >> x;
+        if(type == 1) {
+            toSum += x;
+            toRmv[color] += x;
         }
-
         else {
-            if(toRight * (v[r] - v[r - 1]) <= k) {
-                k -= toRight * (v[r] - v[r - 1]);
-                r--;
-            }
+            int ini = 0, mid, end = b[color].size() - 1, ans = -1;
+            while(ini <= end) {
+                mid = (ini + end)/2;
 
-            else {
-                v[r] -= k/toRight;
-                k = 0;
+                ll tot = toSum * (mid + 1) - (toRmv[color] * (mid + 1)) + b[color][mid];
+                if(tot <= x) {
+                    ans = max(ans, mid);
+                    ini = mid + 1;
+                }
+                else end = mid - 1;
             }
+            cout << ans + 1 << endl;
         }
     }
-    
-    cout << v[r] - v[l] << endl;
 }
 
 int32_t main() {
+    FAST;
     int ct = 1;
     // cin >> ct;
     while(ct--)

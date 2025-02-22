@@ -29,60 +29,27 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 1e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int n, k;
-int v[MAXN];
+int BIT[MAXN];
+int N;
+void update(int x,int val) { while(x<=N)  {  BIT[x]+=val;  x+=(x&-x);  } }
+int query(int x) {  int res=0;  while(x>0)  {  res+=BIT[x];  x-=(x&-x);  } return res; } 
 
 
 void solve() {
+    int n, k;
     cin >> n >> k;
-    for(int i = 0; i < n; i++)
-        cin >> v[i];
-    sort(v, v + n);
-    
-    int l = 0, r = n - 1;
-   
-    while(k && l < r) {
-        while(l + 1 < r && v[l] == v[l + 1])
-            l++;
-        while(r - 1 >= l && v[r] == v[r - 1])
-            r--;
+    N = n;
 
-        if(l == r)
-            break;
-        
-        int toRight = (n - 1) - r + 1;
-        if(l + 1 <= toRight) {
-            
-            if( (l + 1) * (v[l + 1] - v[l]) <= k) {
-                k -= (l + 1) * (v[l + 1] - v[l]);
-                l++;
-            }
-
-            else {
-                v[l] += k/(l + 1);
-                k = 0;
-            }
-        
-        }
-
-        else {
-            if(toRight * (v[r] - v[r - 1]) <= k) {
-                k -= toRight * (v[r] - v[r - 1]);
-                r--;
-            }
-
-            else {
-                v[r] -= k/toRight;
-                k = 0;
-            }
-        }
+    vector<int> v(n);
+    for(int &i : v) {
+        cin >> i;
+        update(i, 1);
     }
     
-    cout << v[r] - v[l] << endl;
 }
 
 int32_t main() {

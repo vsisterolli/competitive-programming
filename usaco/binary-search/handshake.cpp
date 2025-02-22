@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -29,63 +28,69 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 1e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int n, k;
-int v[MAXN];
-
-
 void solve() {
+    int n, k;
     cin >> n >> k;
-    for(int i = 0; i < n; i++)
-        cin >> v[i];
-    sort(v, v + n);
-    
-    int l = 0, r = n - 1;
-   
-    while(k && l < r) {
-        while(l + 1 < r && v[l] == v[l + 1])
-            l++;
-        while(r - 1 >= l && v[r] == v[r - 1])
-            r--;
 
-        if(l == r)
-            break;
-        
-        int toRight = (n - 1) - r + 1;
-        if(l + 1 <= toRight) {
-            
-            if( (l + 1) * (v[l + 1] - v[l]) <= k) {
-                k -= (l + 1) * (v[l + 1] - v[l]);
-                l++;
-            }
+    vector<int> v(n), ap(MAXN + 1);
+    vector<ll> sap(MAXN + 1);
+    for(int &i : v) {
+        cin >> i;
+        ap[i]++;
+        sap[i] += i;
+    }
 
-            else {
-                v[l] += k/(l + 1);
-                k = 0;
-            }
-        
-        }
-
-        else {
-            if(toRight * (v[r] - v[r - 1]) <= k) {
-                k -= toRight * (v[r] - v[r - 1]);
-                r--;
-            }
-
-            else {
-                v[r] -= k/toRight;
-                k = 0;
-            }
-        }
+    sort(all(v), greater<int>());
+    for(int i = 1; i < MAXN; i++) {
+        ap[i] += ap[i - 1];
+        sap[i] += sap[i - 1];
     }
     
-    cout << v[r] - v[l] << endl;
+    int ini = 1, mid, end = 2e5, ans = 2;
+    while(ini <= end) {
+        mid = (ini + end)/2;
+
+        int tot = 0;
+        for(int i = 0; i < n; i++) {
+            if(v[i] >= mid)
+                tot += n;
+            else
+                tot += ap[MAXN - 1] - ap[mid - v[i] - 1];
+        }
+
+        if(tot >= k) {
+            ans = max(ans, mid);
+            ini = mid + 1;
+        }
+        else end = mid - 1;
+        
+    }
+
+    ll sum = 0;
+    for(int i = 0; k && i < n; i++)  {
+        
+        int ini = 0, mid, end = MAXN - 1, ans = -1;
+        while(ini <= end) {
+            mid = (ini + end)/2;
+
+            if(ap[MAXN - 1] - (v[i] >= mid ? 0 : ap[ans - v[i] - 1]) <= k){
+                ans = max(ans, )
+            }
+
+        }
+
+    }
+
+    cout << sum << endl;
+
 }
 
 int32_t main() {
+    FAST;
     int ct = 1;
     // cin >> ct;
     while(ct--)
