@@ -5,12 +5,10 @@
 #define INF 0x3f3f3f3f
 #define LINF 0x3f3f3f3f3f3f3f3f
 #define endl '\n'
-#define ll long long
 #define f first
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -21,6 +19,8 @@
 #define lb lower_bound
 #define right direita
 using namespace std;
+using ll = long long;
+#define int long long
 void setIO(string s) {
     ios_base::sync_with_stdio(0); cin.tie(0);
     freopen((s+".in").c_str(),"r",stdin);
@@ -33,54 +33,41 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+ll progSum(int l, ll r) {
+    return 1ll * ((l + r) * (r - l + 1))/2;
+}
+
+int q;
+
+ll f(int mid) {
+    return min(1ll * q - 2 * mid + 1, progSum(1, mid - 2));
+}
+
 void solve() {
-    int n, k;
-    cin >> n >> k;
+    cin >> q;
 
-    vector<int> v(n);
-    vector<int> aux;
-
-    for(int &i : v) {
-        cin >> i;
-        aux.pb(i);
-    }
-    
-    sort(all(aux));
-
-    int medPos = (n + 1)/2 - 1;
-    
-    int ini = aux[medPos], mid, end = n, ans = aux[medPos];
+    int ini = 3, mid, end = q;
+    ll ans = q - 1;
     while(ini <= end) {
         mid = (ini + end)/2;
 
-        int l = 0, r = 0, best[n], sum = 0, deu = -1;
-        for(int i = 0; i < n; i++) {
-            sum += (v[i] >= mid);
-            sum -= (v[i] < mid);
-            best[i] = sum;
-        }
+        ll cur = f(mid), more = f(mid + 1);
+        ans = max({ans, cur + q - 1, more + q - 1});
 
-        int mx = best[k - 1];
-        int mn = 0;
+        if(more >= cur) 
+            ini = mid + 2;
+        else 
+            end = mid - 1;
         
-        for(int i = k; i < n; i++) {
-            mn = min(best[i - k], mn);
-            mx = max(mx, best[i] - mn);
-        }
+    }    
 
-        if(mx > 0) {
-            ini = mid + 1;
-            ans = max(ans, mid);
-        } else end = mid - 1;
-
-    }
     cout << ans << endl;
-    
 }
 
 int32_t main() {
+    FAST;
     int ct = 1;
-    // cin >> ct;
+    cin >> ct;
     while(ct--)
         solve();
     return 0;

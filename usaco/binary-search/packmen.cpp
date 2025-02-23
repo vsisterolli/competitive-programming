@@ -34,48 +34,53 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n, k;
-    cin >> n >> k;
+    int n;
+    cin >> n;
 
-    vector<int> v(n);
-    vector<int> aux;
+    string s;
+    cin >> s;
 
-    for(int &i : v) {
-        cin >> i;
-        aux.pb(i);
+    vector<int> pack, ast;
+    for(int i = 0; i < n; i++) {
+        if(s[i] == 'P')
+            pack.pb(i);
+        if(s[i] == '*')
+            ast.pb(i);
     }
-    
-    sort(all(aux));
 
-    int medPos = (n + 1)/2 - 1;
-    
-    int ini = aux[medPos], mid, end = n, ans = aux[medPos];
-    while(ini <= end) {
+    int ini = 1, mid, end = 2 * n + 1, ans = 2 * n + 1;
+    while(ini <= end) { 
         mid = (ini + end)/2;
-
-        int l = 0, r = 0, best[n], sum = 0, deu = -1;
-        for(int i = 0; i < n; i++) {
-            sum += (v[i] >= mid);
-            sum -= (v[i] < mid);
-            best[i] = sum;
-        }
-
-        int mx = best[k - 1];
-        int mn = 0;
         
-        for(int i = k; i < n; i++) {
-            mn = min(best[i - k], mn);
-            mx = max(mx, best[i] - mn);
+        int curast = 0;
+        for(int &i : pack) {
+            
+            if(curast >= ast.size())
+                break;
+            if(abs(ast[curast] - i) > mid)
+                continue;
+                
+            int xd = curast;
+            while(xd < ast.size()) {
+                int leftFirst = abs(i - ast[curast]) + abs(ast[curast] - ast[xd]);
+                int rightFirst = abs(i - ast[xd]) + abs(ast[xd] - ast[curast]);
+
+                if(min(leftFirst, rightFirst) <= mid)
+                    xd++;
+                else break;
+            }
+            curast = xd;
+
         }
 
-        if(mx > 0) {
-            ini = mid + 1;
-            ans = max(ans, mid);
-        } else end = mid - 1;
+        if(curast == ast.size()) {
+            ans = min(ans, mid);
+            end = mid - 1;
+        } else ini = mid + 1;
 
     }
     cout << ans << endl;
-    
+
 }
 
 int32_t main() {

@@ -4,6 +4,7 @@
         "chrono": "cpp",
         "span": "cpp",
         "type_traits": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "tuple": "cpp"
     }
 }
