@@ -33,44 +33,52 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-void solve() {
-    int n, l;
-    cin >> n >> l;
+vector<int> bfs(int start, int n, vector<vi> &g) {
+    vector<int> dist(n + 5, -1);
+    queue<int> q({start});
+    dist[start] = 0;
 
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
+    while(!q.empty()) {
+        int u = q.front();
+        q.pop();
 
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
-        
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
-        }
-
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
+        for(int &nxt : g[u])
+            if(dist[nxt] == -1) {
+                dist[nxt] = dist[u] + 1;
+                q.push(nxt);
+            }
     }
-    cout << fixed << setprecision(5) << ans << endl;
-    
+    return dist;
 }
 
 int32_t main() {
-    int ct = 1;
-    // cin >> ct;
-    while(ct--)
-        solve();
-    return 0;
+    int n;
+    cin >> n;
+
+    vector<vector<int>> g(n+1);
+    vector<int> sz(n + 1);
+    for(int i = 1; i < n; i++) {
+        int a, b;
+        cin >> a >> b;
+        g[a].pb(b);
+        g[b].pb(a);
+    }
+
+    vi da = bfs(1, n, g);
+
+    int curEndp = 1;
+    for(int i = 1; i <= n; i++)
+        if(da[i] > da[curEndp])
+            curEndp = i;
+    
+    vi db = bfs(curEndp, n, g);
+    for(int i = 1; i <= n; i++)
+        if(db[i] > db[curEndp])
+            curEndp = i;
+    da = bfs(curEndp, n, g);
+
+    for(int i = 1; i <= n; i++)
+        cout << max(da[i], db[i]) << " ";
+    cout << endl;
+    
 }

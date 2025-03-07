@@ -34,37 +34,38 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n, l;
-    cin >> n >> l;
+    int n, m;
+    cin >> n >> m;
 
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
-
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
+    char mat[n][m];
+    for(int i = 0; i < n; i++)
+        for(char &j : mat[i])
+            cin >> j;
         
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
+    int ans = 0;
+    int x[4] = {1, -1, 0, 0}, y[4] = {0, 0, 1, -1};
 
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
-        }
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < m; j++) 
+            if(mat[i][j] == '.') {
+                ans++;
+                queue<pii> q({{i, j}});
+                while(!q.empty()) {
+                    pii cur = q.front();
+                    q.pop();
+                    mat[cur.f][cur.s] = '#';
+                    for(int k = 0; k < 4; k++) {
+                        int ni = cur.f + x[k], nj = cur.s + y[k];
+                        if(ni >= 0 && nj >= 0 && ni < n && nj < m && mat[ni][nj] == '.') {
+                            mat[ni][nj] = '#';
+                            q.push({ni, nj});
+                        }
+                    }
+        
+                }
+            }
 
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
-    }
-    cout << fixed << setprecision(5) << ans << endl;
-    
+    cout << ans << endl;
 }
 
 int32_t main() {

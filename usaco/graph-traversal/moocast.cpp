@@ -33,44 +33,50 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-void solve() {
-    int n, l;
-    cin >> n >> l;
+void dfs(vector<vector<int>> &g, vector<int> &used, int u) {
+    used[u] = 1;
+    for(int &i : g[u])
+        if(!used[i])
+            dfs(g, used, i);
+}
+
+int32_t main() {
+    setIO("moocast");
+    int n;
+    cin >> n;
 
     vector<pii> v(n);
     for(pii &i : v)
         cin >> i.f >> i.s;
-
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
-        
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
-        }
-
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
-    }
-    cout << fixed << setprecision(5) << ans << endl;
     
-}
+    ll ini = 1, mid, end = 1e12, ans = 1e12;
+    while(ini <= end) {
+        mid = (ini + end)/2;
 
-int32_t main() {
-    int ct = 1;
-    // cin >> ct;
-    while(ct--)
-        solve();
-    return 0;
+        vector<vector<int>> g(n);
+        vector<int> used(n);
+
+        for(int i = 0; i < n; i++)
+            for(int j = i + 1; j < n; j++) {
+                int x = (v[i].f - v[j].f) * (v[i].f - v[j].f);
+                int y = (v[i].s - v[j].s) * (v[i].s - v[j].s);
+                if(x + y <= mid) {
+                    g[i].pb(j); 
+                    g[j].pb(i);
+                }
+            }
+        
+        dfs(g, used, 0);
+        bool deu = true;
+        for(int &i : used)
+            deu &= i;
+        
+        if(deu) {
+            end = mid - 1;
+            ans = min(ans, mid);
+        }
+        else ini = mid + 1;
+    }
+
+    cout << ans << endl;
 }

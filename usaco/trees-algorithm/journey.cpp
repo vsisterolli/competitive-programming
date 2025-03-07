@@ -29,42 +29,41 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 1e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-void solve() {
-    int n, l;
-    cin >> n >> l;
+double avg = 0;
+vector<int> g[MAXN];
 
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
-
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
-        
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
-        }
-
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
+void dfs(int u, int pai, double p, int sz = 0) {
+    if(g[u].size() - (u != pai) == 0) {
+        avg += (double) sz * p;
+        return;
     }
-    cout << fixed << setprecision(5) << ans << endl;
+
+    double newp = (double) p/((int)g[u].size() - (u != pai));
+    for(int &i : g[u]) 
+        if(i != pai)
+            dfs(i, u, newp, sz + 1);
     
+    return;
+}
+
+void solve() {
+    int n;
+    cin >> n;
+
+    for(int i = 0; i + 1 < n; i++) {
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        g[a].pb(b);
+        g[b].pb(a);
+    }
+
+    dfs(0, 0, 1.0);
+    cout << fixed << setprecision(6) << avg << endl;
 }
 
 int32_t main() {

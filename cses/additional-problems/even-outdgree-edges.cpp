@@ -29,44 +29,67 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 3e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
-
-void solve() {
-    int n, l;
-    cin >> n >> l;
-
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
-
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
+ 
+int ans = 0;
+vi lans(MAXN), used(MAXN), h(MAXN), dg(MAXN), g[MAXN];
+ 
+set<pii> s;
+ 
+void dfs(int u, int p = 0) {
+    used[u] = 1;
+    for(int &i : g[u]) {
+        if(!used[i]) {
+            h[i] = h[u] + 1;
+            dfs(i, u);
         
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
+            if(dg[i] & 1) {
+                dg[i]++;
+                s.insert({i, u});
+            }
+ 
+            else {
+                dg[u]++;
+                s.insert({u, i});
+            }
+ 
         }
-
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
+        else {
+            if(h[i] < h[u] && i != p) {
+                dg[u]++;
+                s.insert({u, i});
+            }
+        }
     }
-    cout << fixed << setprecision(5) << ans << endl;
-    
 }
-
+ 
+void solve() {
+    int n, m;
+    cin >> n >> m;
+ 
+    for(int i = 0; i < m; i++) {
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        g[a].pb(b);
+        g[b].pb(a);
+    }
+ 
+    for(int i = 0; i < n; i++)
+        if(!used[i])
+            dfs(i);
+    for(int i = 0; i < n; i++)
+        if(dg[i] & 1) {
+            cout << "IMPOSSIBLE" << endl;
+            return;
+        }
+ 
+    for(pii i : s)
+        cout << i.f+1 << " " << i.s+1 << endl;
+}
+ 
 int32_t main() {
     int ct = 1;
     // cin >> ct;

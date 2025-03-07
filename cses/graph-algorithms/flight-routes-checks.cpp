@@ -33,44 +33,51 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-void solve() {
-    int n, l;
-    cin >> n >> l;
+vector<int> g[MAXN];
+bool vis[MAXN];
 
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
-
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
-        
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
-        }
-
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
-    }
-    cout << fixed << setprecision(5) << ans << endl;
-    
+void dfs(int u) {
+    vis[u] = 1;
+    for(int &i : g[u])
+        if(!vis[i])
+            dfs(i);
 }
 
 int32_t main() {
-    int ct = 1;
-    // cin >> ct;
-    while(ct--)
-        solve();
-    return 0;
+    int n, m;
+    cin >> n >> m;
+
+    vector<pii> edges;
+    for(int i = 0; i < m; i++) {
+        int a, b;
+        cin >> a >> b;
+
+        g[a].pb(b);
+        edges.pb({a, b});
+    }
+
+    dfs(1);
+    for(int i = 2; i <= n; i++)
+        if(!vis[i]) {
+            cout << "NO" << endl;
+            cout << 1 << " " << i << endl;
+            return 0;
+        }
+    
+    for(int i = 1; i <= n; i++)
+        g[i].clear();
+    for(pii &i : edges)
+        g[i.s].push_back(i.f);
+    memset(vis, 0, sizeof vis);
+
+    dfs(1);
+    for(int i = 2; i <= n; i++)
+        if(!vis[i]) {
+            cout << "NO" << endl;
+            cout << i << " " << 1 << endl;
+            return 0;
+        }
+    
+    cout << "YES" << endl;
+
 }

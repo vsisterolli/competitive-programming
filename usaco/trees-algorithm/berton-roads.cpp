@@ -33,38 +33,59 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-void solve() {
-    int n, l;
-    cin >> n >> l;
+int dp[MAXN], used[MAXN], h[MAXN];
+vi g[MAXN];
 
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
-
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
-        
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
+void createTree(int u) {
+    used[u] = 1;
+    for(int &i : g[u]) {
+        if(!used[i]) {
+            debug2(u+1, i+1);
+            h[i] = h[u] + 1;
+            createTree(i);
+            dp[u] += dp[i];
         }
+        else if(abs(h[u] - h[i]) > 1) {
+            if(h[i] > h[u])
+                dp[u]--;
+            if(h[i] < h[u])
+                dp[u]++;
+        }
+    }
+    
+    if(!dp[u] && h[u]) {
+        cout << 0 << endl;
+        exit(0);
+    }
+}
 
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
+void solve() {
+    int n, m;
+    cin >> n >> m;
+
+    vector<array<int, 2>> edges;
+    for(int i = 0; i < m; i++) {
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        g[a].pb(b);
+        g[b].pb(a);
+        edges.pb({a, b});
+    }
+
+    
+    createTree(0);
+    for(auto &i : edges) {
+        sort(i.begin(), i.end(), [&](int a, int b) -> bool {
+            return h[a] < h[b];
+        });
+
+        if(h[i[1]] - h[i[0]] == 1)
+            cout << i[0] + 1 << " " << i[1] + 1 << endl;
+        else
+            cout << i[1] + 1 << " " << i[0] + 1 << endl;
 
     }
-    cout << fixed << setprecision(5) << ans << endl;
-    
 }
 
 int32_t main() {

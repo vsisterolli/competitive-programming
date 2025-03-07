@@ -33,44 +33,27 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-void solve() {
-    int n, l;
-    cin >> n >> l;
-
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
-
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
-        
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
-        }
-
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
-    }
-    cout << fixed << setprecision(5) << ans << endl;
-    
+int dfs(int u, int p, vector<vector<int>> &g, vector<int> &sz) {
+    for(int &i : g[u])
+        if(i != p) 
+            sz[u] += dfs(i, u, g, sz) + 1; 
+    return sz[u];
 }
 
 int32_t main() {
-    int ct = 1;
-    // cin >> ct;
-    while(ct--)
-        solve();
-    return 0;
+    int n;
+    cin >> n;
+
+    vector<vector<int>> g(n+1);
+    vector<int> sz(n + 1);
+    for(int i = 1; i < n; i++) {
+        int x;
+        cin >> x;
+        g[x].pb(i + 1);
+        g[i + 1].pb(x);
+    }
+
+    dfs(1, 1, g, sz);
+    for(int i = 1; i <= n; i++)
+        cout << sz[i] << " ";
 }

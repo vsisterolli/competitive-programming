@@ -29,42 +29,61 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 3e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-void solve() {
-    int n, l;
-    cin >> n >> l;
+int ans = 0;
+vi lans(MAXN), used(MAXN), dp(MAXN), h(MAXN);
+vi g[MAXN];
 
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
+void dfs(int u, int p = 0) {
+    used[u] = 1;
 
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
-        
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
+    vi sons;
+    for(int &i : g[u]) {
+        if(i == p)
+            continue;
+        if(!used[i]) {
+            h[i] = h[u] + 1;
+            dfs(i, u);
+            lans[u] = max(lans[u], lans[i]);
+            dp[u] += dp[i];
+            sons.pb(lans[i]);
         }
-
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
+        else {
+            if(h[i] > h[u])
+                dp[u]--;
+            else
+                dp[u]++;
+        }
     }
-    cout << fixed << setprecision(5) << ans << endl;
+
+    sort(all(sons), greater<int>());
+    if(!dp[u] && h[u])
+        lans[u]++;
     
+    int cur = 0;
+    for(int i = 0; i < sons.size() && i < 2; i++)
+        cur += sons[i];
+
+    ans = max({ans, lans[u], cur});
+}
+
+void solve() {
+    int n, m;
+    cin >> n >> m;
+
+    for(int i = 0; i < m; i++) {
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        g[a].pb(b);
+        g[b].pb(a);
+    }
+
+    dfs(0);
+    cout << ans << endl;
 }
 
 int32_t main() {

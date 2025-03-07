@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -34,43 +33,72 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n, l;
-    cin >> n >> l;
+    int n, m;
+    cin >> n >> m;
 
-    vector<pii> v(n);
-    for(pii &i : v)
-        cin >> i.f >> i.s;
+    map<pii, bool> del;
+    vector<int> g(n);
+    set<int> no_comp;
 
-    int ini = 0, end = 2e15;
-    double ans = 2e15;
-    while(ini <= end) {
-        double mid = 1.0 * ((double)ini + end)/2e5;
+    for(int i = 0; i < n; i++)
+        no_comp.insert(i);
+
+    for(int i = 0; i < m; i++) {
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+
+        del[{a, b}] = del[{b, a}] = 1;
         
-        double cur = 0;
-        for(pii &i : v) {
-            double c = mid;
-            double b = i.s;
-            double a = 1.0 * sqrt((double)c * c - b * b);
-
-            if( i.f - a <= cur )
-                cur = max(cur, i.f + a);
-        }
-
-        int xd = (ini + end)/2;
-        if(cur >= l) {
-            end = xd - 1;
-            ans = min(ans, mid);
-        } else ini = xd + 1;
-
+        g[a]++;
+        g[b]++;
     }
-    cout << fixed << setprecision(5) << ans << endl;
+    
+    queue<int> q;
+    vi ans;
+
+    for(int i = 0; i < n; i++) {
+        if(no_comp.find(i) == no_comp.end())
+            continue;
+        
+        q.push(i);
+        int anssz = 0;
+        while(!q.empty()) {
+            int cur = q.front();
+            q.pop();
+            anssz++;
+
+            no_comp.erase(cur);
+
+            vector<int> trmv;
+            for(int i : no_comp) 
+                if(!del[{i, cur}] && !del[{cur, i}]) {
+                    trmv.push_back(i);
+                    q.push(i);
+                }
+                
+            for(int &i : trmv) 
+                no_comp.erase(i);
+        
+            
+        }
+        ans.push_back(anssz);
+    }
+
+        
+
+    sort(all(ans));
+    cout << ans.size() << endl;
+    for(int &i : ans)
+        cout << i << " ";
+    cout << endl;
     
 }
 
 int32_t main() {
     int ct = 1;
     // cin >> ct;
-    while(ct--)
+    while(ct--) 
         solve();
     return 0;
 }
