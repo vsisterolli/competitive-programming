@@ -110,14 +110,9 @@ ll DFS(int u, int target, ll bottleneck = LINF) {
 
 int32_t main() {
 
-    int ct = 0;
-    while(cin >> n) {
-        if(!n)
-            break;
-
-        for(int i = 0; i <= n; i++)
-            g[i].clear();
-        edges.clear();
+    for(int i = 0; i <= n; i++)
+        g[i].clear();
+    edges.clear();
         
         int s, t;
         cin >> s >> t >> m;
