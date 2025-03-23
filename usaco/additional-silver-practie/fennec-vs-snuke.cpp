@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -28,64 +29,72 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 1e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+vi g[MAXN];
+int pai[MAXN], black[MAXN];
+
+void dfs(int u) {
+    for(int &i : g[u])
+        if(i != pai[u]) {
+            pai[i] = u;
+            dfs(i);
+        }
+}
+
+int count(int u) {
+    int tot = 1;
+    for(int &i : g[u])
+        if(i != pai[u] && !black[i])
+            tot += count(i);
+    return tot;
+}
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
+    int n;
+    cin >> n;
 
-    vector<int> v(n + 1);
-
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
+    for(int i = 1; i < n; i++) {
+        int a, b;
+        cin >> a >> b;
+        g[a].pb(b);
+        g[b].pb(a);
     }
 
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
-        }
+    pai[1] = 1;
+    dfs(1);
 
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
+    vector<int> path = {};
+    
+    int u = n;
+    while(u != 1) {
+        path.push_back(u);
+        u = pai[u];
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
+    path.push_back(1);
+    reverse(all(path));
 
+    int l = 1, r = path.size() - 2;
+    black[path[r + 1]] = 1;
+    while(l <= r) {
+        l++;
+        if(l <= r) {
+            black[path[r]] = 1;
+            r--;
+        }
+    }
 
+    int cnt = count(1);
+    if(cnt > n/2) 
+        cout << "Fennec" << endl;
+    else cout << "Snuke" << endl;
 }
 
 int32_t main() {
-    FAST;
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

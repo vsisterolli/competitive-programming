@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -32,60 +33,49 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
+    int n, m;
+    cin >> n >> m;
 
-    vector<int> v(n + 1);
+    vector<vi> mat(n + 5, vi(m + 5));
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < m; j++)
+            cin >> mat[i][j];
 
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
+    int used[n + 5][m + 5], color[n + 5][m + 5];
+    memset(used, 0, sizeof used);
 
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
+    vector<array<int, 3>> ans;
+    queue<array<int, 3>> q({{0, 0, 1}, {n - 1, m - 1, -1}});
+
+    while(!q.empty()) {
+        array<int, 3> cur = q.front(); q.pop();
+
+        // if(cur[0] + cur[2] < 0 || cur[1] + cur[2] < 0 || cur[0] + cur[2] >= n || cur[1] + cur[2] >= m)
         
-        auto head = heads.upper_bound(i);
-        head--;
+        int x[4] = {cur[2], cur[2], 0, 0};
+        int y[4] = {0, 0, cur[2], cur[2]};
 
-        if(v[i] < v[*head])
-            heads.insert(i);
-    }
+        if(mat[cur[0]][cur[1]] != color[cur[0]][cur[1]]) {
 
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
+            if(cur[2] == 1)
+                ans.push_back({cur[0] + 1, cur[1] + 1, cur[]})
+
+            else {
+                if(cur[0] - 1 < 0 || cur[1] - 1 < 0)
+                    continue;
+                    
+            }
+
+
         }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
-
-
 }
 
 int32_t main() {
-    FAST;
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

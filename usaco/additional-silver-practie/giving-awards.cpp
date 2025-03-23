@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -28,64 +29,43 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 3e4 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
+    int n, m;
+    cin >> n >> m;
 
-    vector<int> v(n + 1);
+    vector<int> ans;
 
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
+    map<pii, bool> caraio;
+    for(int i = 0; i < m; i++) {
+        int a, b;
+        cin >> a >> b;
+        caraio[{a, b}] = 1;
     }
 
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
-        }
+    for(int i = 1; i <= n; i++) {
+        ans.push_back(i);
 
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
+        int cur = ans.size() - 1;
+        while(cur > 0 && caraio[{ans[cur - 1], ans[cur]}]) {
+            swap(ans[cur - 1], ans[cur]);
+            cur--;
         }
-
-        cout << heads.size() << " ";
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
+    for(int &i : ans)
+        cout << i << " ";
     cout << endl;
 
-
+    
 }
 
 int32_t main() {
-    FAST;
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

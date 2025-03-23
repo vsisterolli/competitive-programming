@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -32,58 +33,19 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+int ans[(int)1e6 + 5];
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
-
-    vector<int> v(n + 1);
-
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
-    }
-
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
-        }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
-    }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
-
-
+    int n;
+    cin >> n;
+    cout << ans[n] << endl;
 }
 
 int32_t main() {
-    FAST;
+    for(int i = 1; i <= 1e6; i++)
+        for(int j = i; j <= 1e6; j += i)
+            ans[j]++;
+
     int ct = 1;
     cin >> ct;
     while(ct--)

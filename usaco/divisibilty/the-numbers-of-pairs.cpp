@@ -28,62 +28,57 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e7 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+int factor[MAXN];
+
+void sieve() {
+    for(int i = 2; i < MAXN; i++)
+        if(!factor[i])
+            for(int j = i; j < MAXN; j += i)
+                factor[j] = i;
+}
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
+    int c, d, x;
+    cin >> c >> d >> x;
 
-    vector<int> v(n + 1);
-
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
+    long long ans = 0;
+    for(int g = 1; g * g <= x; g++) {
+        if( !(x % g) && !((x/g + d) % c) ) {
+            int AB = ((x/g) + d)/c, cur = 0;
+            while(AB > 1) {
+                int p = factor[AB];
+                while(AB % p == 0)
+                    AB /= p;
+                cur++;
+            }
+            ans += (1ll<<cur);
+        }
+        int pg = g;
+        g = x/g;
+        if(g > 0 && g > pg && !(x % g) && !((x/g + d) % c) ) {
+            int AB = ((x/g) + d)/c, cur = 0;
+            while(AB > 1) {
+                int p = factor[AB];
+                while(AB % p == 0)
+                    AB /= p;
+                cur++;
+            }
+            ans += (1ll<<cur);
+        }
+        g = pg;
     }
 
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
-        }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
-    }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
-
-
+    
+    cout << ans << endl;
 }
 
 int32_t main() {
     FAST;
+    sieve();
     int ct = 1;
     cin >> ct;
     while(ct--)

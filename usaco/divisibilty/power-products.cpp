@@ -6,6 +6,7 @@
 #define LINF 0x3f3f3f3f3f3f3f3f
 #define endl '\n'
 #define ll long long
+#define int long long
 #define f first
 #define fin cin
 #define fout cout
@@ -28,64 +29,67 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 1e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+int factor[MAXN];
+
+void sieve() {
+    for(int i = 2; i < MAXN; i++)
+        if(!factor[i])
+            for(int j = i; j < MAXN; j += i)
+                factor[j] = i;
+}
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
+    sieve();
+    int n, k;
+    cin >> n >> k;
 
-    vector<int> v(n + 1);
+    int pcubes = 0, ans = 0;
+    map<vector<pii>, int> ap;
+    for(int i = 0; i < n; i++) {
+        int x;
+        cin >> x;
+        vector<pii> factorization, invfactorization;
+        while(x > 1) {
+            int p = factor[x], qtd = 0;
+            while(x % p == 0) {
+                x /= p;
+                qtd++;
+            }
+            qtd %= k;
 
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
-    }
-
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
+            if(!qtd)
+                continue;
+            factorization.push_back({p, qtd});
+            invfactorization.push_back({p, k - qtd});
+        }
+        if(x > 1) {
+            factorization.push_back({x, 1});
+            invfactorization.push_back({x, k - 1});
         }
 
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
+        if(!factorization.size()) 
+            ans += pcubes++;
+
+        else {
+            ans += ap[invfactorization];
+            ap[factorization]++;
         }
-
-        cout << heads.size() << " ";
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
 
+
+    cout << ans << endl;
+    
 
 }
 
 int32_t main() {
     FAST;
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

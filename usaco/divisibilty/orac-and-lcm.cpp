@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -32,60 +33,57 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+int factor[MAXN];
+
+void sieve() {
+    for(int i = 2; i < MAXN; i ++)
+        if(!factor[i])
+            for(int j = i; j < MAXN; j+= i)
+                factor[j] = i;
+}
+
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
+    int n;
+    cin >> n;
 
-    vector<int> v(n + 1);
-
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
-    }
-
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
+    vi v(n);
+    for(int &i : v)
+        cin >> i;
+    
+    map<int, vector<int>> ap;
+    
+    for(int &i : v) 
+        while(i > 1) {
+            int p = factor[i];
+            int qtd = 1;
+            while(i % p == 0) {
+                qtd *= p;
+                i /= p;
+            }
+            ap[p].push_back(qtd);
         }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
+    
+    int ans = 1;
+    for(auto &i : ap) {
+        sort(all(i.s));
+        if(i.s.size() <= n - 2) 
+            continue;
+        
+        else if(i.s.size() == n - 1) 
+            ans *= i.s[0];
+        
+        else 
+            ans *= i.s[1];
+        
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
-
-
+    cout << ans << endl;
 }
 
 int32_t main() {
-    FAST;
+    sieve();
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

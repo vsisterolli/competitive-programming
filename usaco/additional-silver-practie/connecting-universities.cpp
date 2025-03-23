@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -32,60 +33,44 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+vector<int> mark(MAXN), g[MAXN];
+int n, k;
+
+int ans = 0;
+
+int dfs(int u, int p = 1) {
+
+    int tot = mark[u];
+    for(int &i : g[u]) 
+        if(i != p)
+            tot += dfs(i, u);
+
+    ans += min(2 * k - tot, tot);
+    return tot;
+}
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
-
-    vector<int> v(n + 1);
-
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
+    cin >> n >> k;
+    for(int i = 0; i < 2 * k; i++) {
+        int x;
+        cin >> x;
+        mark[x] = 1;
     }
 
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
-        }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
+    for(int i = 0; i + 1 < n; i++) {
+        int a, b;
+        cin >> a >> b;
+        g[a].pb(b);
+        g[b].pb(a);
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
 
-
+    dfs(1);
+    cout << ans << endl;
 }
 
 int32_t main() {
-    FAST;
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

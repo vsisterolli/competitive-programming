@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -33,57 +34,51 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n, q;
+    int n,q ;
     cin >> n >> q;
 
-    vector<int> v(n + 1);
+    vi v(n), xr(n);
+    for(int &i : v)
+        cin >> i;
+    reverse(all(v));
 
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
+    xr[0] = v[0];
+    for(int i = 1; i < n; i++)
+        xr[i] = v[i] ^ xr[i - 1];
 
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
+    vector<int> ap[30];
 
-        if(v[i] < v[*head])
-            heads.insert(i);
-    }
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < 30; j++)
+            if( (1<<j) & v[i])
+                ap[j].push_back(i);
 
-    int xd = 0;
     while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
+        int x;
+        cin >> x;
+        int cur = -1, lim = n - 1;
+
+        for(int i = 29; i >= 0; i--) {
+            auto it = upper_bound(all(ap[i]), cur);
+            if(it == ap[i].end() || *it > lim)
+                continue;
+                
+            int aux = x ^ (*it == 0 ? 0 : xr[*it - 1]);
+            // debug4(i, *it, cur, lim);
+            // debug(aux);
+            if(aux >= v[*it]) {
+                cur = *it;
+                i++;
+            }
+            else lim = *it - 1;
         }
 
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
+        cout << cur + 1 << " ";
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
     cout << endl;
-
-
 }
 
 int32_t main() {
-    FAST;
     int ct = 1;
     cin >> ct;
     while(ct--)

@@ -33,53 +33,38 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n, q;
-    cin >> n >> q;
-
-    vector<int> v(n + 1);
-
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
+    int n;
+    cin >> n;
+    
+    vi v(n), ans(n + 1);
+    for(int &i : v)
+        cin >> i;
+    
+    vector<array<int, 3>> list;
+    for(int i = 0; i < n; i++) {
+        for(auto &j : list)
+            j[2] = __gcd(j[2], v[i]);
         
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
+        list.push_back({i, i, v[i]});
+        
+        int sz = 0;
+        for(int j = 0; j < list.size(); j++) {
+            if(sz && list[sz - 1][2] == list[j][2]) 
+                list[sz - 1][1] = list[j][1];
+            else
+                list[sz++] = list[j];
+        }
+        list.resize(sz);
+        
+        for(auto &j : list) 
+            if(ans[i - j[0] + 1] < j[2])            
+                ans[i - j[0] + 1] = j[2];
+        
     }
 
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
-        }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
-    }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
+    for(int i = 1; i <= n; i++)
+        cout << ans[i] << " ";
     cout << endl;
-
-
 }
 
 int32_t main() {

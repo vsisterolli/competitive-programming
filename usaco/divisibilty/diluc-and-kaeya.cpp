@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -33,57 +34,31 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n, q;
-    cin >> n >> q;
+    int n;
+    cin >> n;
+    string s;
+    cin >> s;
 
-    vector<int> v(n + 1);
-
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
+    int x = 0, y = 0;
+    map<pii, int> qtdR;
+    for(int i = 0; i < n; i++) {
+        x += (s[i] == 'D');
+        y += (s[i] == 'K');
         
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
-    }
-
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
+        if(!x || !y) {
+            cout << x + y << " ";
+            continue;
         }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
+        else {
+            int nx = x/__gcd(x, y);
+            int ny = y/__gcd(x, y);
+            cout << ++qtdR[{nx, ny}] << " ";
         }
-
-        cout << heads.size() << " ";
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
     cout << endl;
-
-
 }
 
 int32_t main() {
-    FAST;
     int ct = 1;
     cin >> ct;
     while(ct--)

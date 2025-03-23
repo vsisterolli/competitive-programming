@@ -10,6 +10,7 @@
 #define fin cin
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -32,58 +33,58 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+vector<int> g[MAXN], pai(MAXN);
+
+int best = 1, bdist = 1;
+void dfs(int u, int p = 1, int dist = 1) {
+    if(dist > bdist)
+        bdist = dist, best = u;
+
+    for(int &i : g[u])
+        if(i != p) {
+            pai[i] = u;
+            dfs(i, u, dist + 1);
+        }
+}
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
-
-    vector<int> v(n + 1);
-
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
-
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
+    int n;
+    cin >> n;
+    best = 1, bdist = 1;
+    for(int i = 1; i <= n; i++) {
+        pai[i] = 0;
+        g[i].clear();
     }
-
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
-        }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
+    for(int i = 1; i < n; i++) {
+        int a, b;
+        cin >> a >> b;
+        g[a].pb(b);
+        g[b].pb(a);
     }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
+    dfs(1);
+    bdist = 1;
 
+    dfs(best, best);
+    for(int i = 0; i < (bdist - 1)/2; i++)
+        best = pai[best];
 
+        vector<pii> ans;
+    if(bdist & 1) 
+        for(int i = 0; 2 * i <= bdist; i++)
+            ans.push_back({best, i});
+     
+    else
+        for(int i = bdist/2 - 1; i >= 0; i-=2) {
+            ans.push_back({best, i});
+            ans.push_back({pai[best], i});
+        }
+    
+    cout << ans.size() << endl;
+    for(pii &i : ans)
+        cout << i.f << " " << i.s << endl;
 }
 
 int32_t main() {
-    FAST;
     int ct = 1;
     cin >> ct;
     while(ct--)

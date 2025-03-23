@@ -6,6 +6,7 @@
 #define LINF 0x3f3f3f3f3f3f3f3f
 #define endl '\n'
 #define ll long long
+#define int long long
 #define f first
 #define fin cin
 #define fout cout
@@ -32,60 +33,41 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
+long long f(int l, int p) {
+    int w = l/p;
+    int p2 = l % p;
+    int p1 = p - p2;
+    return p1 * w * w + p2 * (w + 1) * (w + 1);
+}
+
 void solve() {
-    int n, q;
-    cin >> n >> q;
+    int n, k;
+    cin >> n >> k;
 
-    vector<int> v(n + 1);
+    long long ans = 0;
+    priority_queue<array<int, 3>> q;
+    for(int i = 0; i < n; i++) {
+        int x;
+        cin >> x;
+        ans += 1ll * x * x;
+        q.push({f(x, 1) - f(x, 2), x, 1});
+    }    
 
-    set<int> heads;
-    heads.insert(1);
-    cin >> v[1];
+    for(int i = 0; i < k - n; i++) {
+        auto [val, l, p] = q.top();
+        q.pop();
 
-    for(int i = 2; i <= n; i++) {
-        cin >> v[i];
-        
-        auto head = heads.upper_bound(i);
-        head--;
-
-        if(v[i] < v[*head])
-            heads.insert(i);
+        p++;
+        ans -= val;
+        q.push({f(l, p) - f(l, p + 1), l, p});
     }
-
-    int xd = 0;
-    while(q--) {
-        int i, k;
-        cin >> i >> k;
-        
-        v[i] -= k;
-        if(i > 1) {
-            auto head = heads.upper_bound(i);
-            head--;
-            
-            if(v[i] < v[*head])
-                heads.insert(i);
-        }
-
-        auto head = heads.upper_bound(i);
-        while(head != heads.end() && v[i] <= v[*head]) {
-            heads.erase(head);
-            head = heads.upper_bound(i);
-            xd++;
-        }
-
-        cout << heads.size() << " ";
-    }
-    if(xd <= 1.5 * n)
-        cout << "NOPE" << endl;
-    cout << endl;
-
-
+    cout << ans << endl;
 }
 
 int32_t main() {
     FAST;
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;

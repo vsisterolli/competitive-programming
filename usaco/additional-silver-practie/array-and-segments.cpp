@@ -34,41 +34,80 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 void solve() {
-    int n, k;
-    cin >> n >> k;
+    int n, m;
+    cin >> n >> m;
 
     vi v(n);
-    for(int &i : v)
+    for(int &i : v) 
         cin >> i;
-    sort(all(v));
-
-    int sum = accumulate(all(v), 0LL);
     
-    int l = n - 1, catched = 1, total = 0;
-    while(sum > k) {
-        if(v[l] - v[0] >= catched) {
-            total++;
-            sum -= (v[l] - v[0]);
-            catched++;
-            l--;
-        }
-        else {
-            int trmv;
-            if(l)
-                trmv = min((sum - k + catched - 1)/catched, catched + v[0] - v[l]);
-            else trmv = (sum - k + catched - 1)/catched;
-            sum -= trmv * catched;
-            v[0] -= trmv;
-            total += trmv;
-        }
+
+    vector<vi> lsegs(n + 1), rsegs(n + 1);
+    vector<pii> segs(m);
+    for(int i = 0; i < m; i++) {
+        int l, r;
+        cin >> l >> r;
+        l--, r--;
+        segs[i] = {l, r};
+        lsegs[r].push_back(l);
+        rsegs[l].push_back(r);
     }
 
-    cout << total << endl;
+    vi ans(n + 1, -INF);
+    vi rmv(n + 1, 0);
+
+    ans[0] = 0;
+
+    int mn = v[0];
+    for(int i = 1; i < n; i++) {
+        for(int &j : lsegs[i - 1]) 
+            for(int k = j; k <= i - 1; k++) {
+                rmv[k]++;
+                mn = min(mn, v[k] - rmv[k]);
+            }
+        ans[i] = max(ans[i], v[i] - mn);
+    }
+
+    fill(all(rmv), 0);
+
+    mn = v[n - 1];
+    for(int i = n - 1; i >= 0; i--) {
+        for(int &j : rsegs[i + 1]) 
+            for(int k = i + 1; k <= j; k++) {
+                rmv[k]++;
+                mn = min(mn, v[k] - rmv[k]);
+            }
+        ans[i] = max(ans[i], v[i] - mn);
+    }
+
+    int mx = *max_element(all(ans));
+
+    if(mx >= *max_element(all(v)) - *min_element(all(v))) {
+        cout << mx << endl;
+        for(int i = 0; i < n; i++) 
+            if(ans[i] == mx) {
+                vi apsegs;
+                for(int j = 0; j < m; j++)
+                    if(segs[j].f > i || segs[j].s < i)
+                        apsegs.pb(j + 1);
+                cout << apsegs.size() << endl;
+                for(int &j : apsegs)
+                    cout << j << " ";
+                cout << endl;
+                return;
+            }
+    }
+    else {
+        cout << *max_element(all(v)) - *min_element(all(v)) << endl;
+        cout << 0 << endl;
+    }
+    
+    
 }
 
 int32_t main() {
     int ct = 1;
-    cin >> ct;
+    // cin >> ct;
     while(ct--)
         solve();
     return 0;
