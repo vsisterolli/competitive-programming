@@ -1,0 +1,28 @@
+Sum of Divisors of N
+
+Let N = P^k * Q'^z where p and q are primes
+
+Sum of Divisors = P^(k + 1)/(P - 1) * Q^(z + 1)/(Q - 1);
+
+
+Multionmial (n | k1, k2, k3, ..., kn)
+Ways of dividing N into sets of size k1, k2, k3, ..., kn such that k1 + k2 + ... + kn = N
+= n1!/(k1! * k2! * k3! * k4!!)
+
+Dearrangements
+Number of permutations where no element keeps its original position
+-> Use inclusion-exclusion prinicipial or
+
+f(n) = {
+    0, n = 1
+    1, n = 2
+    (n - 1)(f(n - 2) + f(n - 1)), n > 2
+}
+
+
+Burnside lemma:
+The number of objects equals the average of simmetrycal pictures for every simmetries
+
+The problem example is coloring a 3x3 table, and if a table is equal to the other one by rotating it, they are the same
+There are 5^9 simmetries for rotating 0 degrees, 5^3 90 degrees, 5^5 180 degrees and 5^3 270 degrees so the total number of pictures is
+(5^9 + 5^3 + 5^5 + 5^3)/4, just see how many squares are free and how many are determined by simmetry
