@@ -26,3 +26,11 @@ The number of objects equals the average of simmetrycal pictures for every simme
 The problem example is coloring a 3x3 table, and if a table is equal to the other one by rotating it, they are the same
 There are 5^9 simmetries for rotating 0 degrees, 5^3 90 degrees, 5^5 180 degrees and 5^3 270 degrees so the total number of pictures is
 (5^9 + 5^3 + 5^5 + 5^3)/4, just see how many squares are free and how many are determined by simmetry
+
+Hockey Sticky Identity
+Summatory(k = r -> n) of C(k, r) = C(n + 1, r + 1);
+Example: n = 10, r = 5 -> C(5, 5) + C(6, 5) + C(7, 5) + C(8, 5) + C(9, 5) + C(10, 5) = C(11, 6);
+
+Also: Summatory(i = 0 -> r) of C(n + i - 1, i) = C(n + r, r);
+Example: n = 5 -> C(4, 0) + C(5, 1) + C(6, 2) + C(7, 3) + C(8, 4) + C(9, 5) = C(10, 5); 
+
