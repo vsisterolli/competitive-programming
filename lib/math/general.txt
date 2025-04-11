@@ -34,3 +34,21 @@ Example: n = 10, r = 5 -> C(5, 5) + C(6, 5) + C(7, 5) + C(8, 5) + C(9, 5) + C(10
 Also: Summatory(i = 0 -> r) of C(n + i - 1, i) = C(n + r, r);
 Example: n = 5 -> C(4, 0) + C(5, 1) + C(6, 2) + C(7, 3) + C(8, 4) + C(9, 5) = C(10, 5); 
 
+Chicken Mcnugget Theorem 
+Let M, N be coprimes, for any integer a and b
+
+MN - M - N is the biggest number that doesn't have solution to
+aM + bN = X
+
+Also, there is (M - 1)(N - 1)/2 impossible solutions
+
+If they are not coprime, then
+lcm(M, N) - M - N is the biggest one, and every multiple of gcd(M, N) bigger than that is representable
+
+Sum of squares
+n(n + 1)(2n + 1)/6
+
+Geometric progression sum
+Sn = a1(q^n - 1)/(q - 1)
+
+Sinfinite = a1/(1 - q) but q must be -1 < q < 1

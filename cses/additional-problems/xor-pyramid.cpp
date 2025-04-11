@@ -52,7 +52,6 @@ void solve() {
 
     int ans = 0;
     for(int i = 0; i < n; i++) {
-
         int ap = fat2[n - 1] - fat2[i] - fat2[n - 1 - i];
         cout << (ap ? 0 : k) << " ";
     }
