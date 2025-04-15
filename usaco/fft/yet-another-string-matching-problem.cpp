@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -29,9 +28,37 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 20000;
+const ll mod = 1e9 + 7, MAXN = 3e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
+
+int pai[MAXN][6], sz[MAXN][6];
+
+void startDsu(int n) {
+    for(int i = 0; i <= n; i++) 
+        for(int j = 0; j <= 5; j++) { 
+            pai[i][j] = j;
+            sz[i][j] = 1;
+        }
+}
+
+int find(int i, int u) {
+    if(pai[i][u] != u)
+        return pai[i][u] = find(i, pai[i][u]);
+    return u;
+}
+
+void join(int i, int a, int b) {
+    a = find(i, a), b = find(i, b);
+    if(a == b) return;
+
+    if(sz[i][a] > sz[i][b])
+        swap(a, b);
+
+    pai[i][a] = b;
+    if(sz[i][a] == sz[i][b])
+        sz[i][b]++;
+}
 
 using cd = complex<double>;
 const double PI = acos(-1);
@@ -90,36 +117,48 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
 }
 
 int32_t main() {
-    int n;
-    cin >> n;
-
-    vi ap(2 * MAXN + 5), helper(2 * MAXN + 5), gotTwice(4 * MAXN + 5);
-    for(int i = 0; i < n; i++) {
-        int x;
-        cin >> x;
-        x += MAXN;
-        ap[x]++;
-        helper[x]++;
-        gotTwice[2 * x]++;
-    }
+    FAST;
+    startDsu(MAXN - 1);
+    string s, t;
+    cin >> s >> t;
     
-    vi duple = multiply(ap, helper);
-    vi triple = multiply(ap, duple);
-    gotTwice = multiply(ap, gotTwice);
+    vector<int> ans(s.size() + t.size());
+    
+    for(char A = 'a'; A <= 'e'; A++) {
+        for(char B = A + 1; B <= 'f'; B++) {
+            vector<int> poly1, poly2, poly3, poly4;
         
-    for(int i = 0; i < gotTwice.size(); i++) {
-        if(gotTwice[i]) {
-            if( (i - 3 * MAXN) % 3 == 0) {
-                triple[i]--;
-                gotTwice[i]--;
+            for(int i = 0; i < s.size(); i++) {
+                poly1.push_back(s[i] == A);
+                poly3.push_back(s[i] == B);
+            }
+            for(int i = 0; i < t.size(); i++) {
+                poly2.push_back(t[i] == B);
+                poly4.push_back(t[i] == A);
             }
             
-            triple[i] = max(triple[i] - 3 * gotTwice[i], 0LL);
+            reverse(all(poly2));
+            reverse(all(poly4));
+            
+            poly1 = multiply(poly1, poly2);
+            poly3 = multiply(poly3, poly4);
+            
+            if(ans.size() < poly1.size()) {
+                ans.resize(poly1.size());
+            }
+
+            for(int i = t.size() - 1, j = 0; j<= (int)s.size() - t.size(); j++, i++) {
+                if((poly1[i] | poly3[i]) && find(i, A - 'a') != find(i, B - 'a')) {
+                    join(i, A - 'a', B - 'a');
+                    ans[i]++;
+                }
+            }
+            
         }
+
     }
 
-    for(int i = - 3 * MAXN; i + 3 * MAXN < triple.size(); i++) 
-        if(triple[i + 3 * MAXN]/6 > 0)
-            cout << i << " : " << triple[i + 3 * MAXN]/6 << endl;
-    
+    for(int i = (int)t.size() - 1, j = 0; j <= (int)s.size() - t.size();  j++, i++)
+        cout << ans[i] << " ";
+    cout << endl;
 }

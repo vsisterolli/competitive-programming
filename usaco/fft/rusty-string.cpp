@@ -29,7 +29,7 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 20000;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
@@ -89,37 +89,74 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
     return result;
 }
 
-int32_t main() {
+void solve() {
     int n;
     cin >> n;
 
-    vi ap(2 * MAXN + 5), helper(2 * MAXN + 5), gotTwice(4 * MAXN + 5);
+    string s;
+    cin >> s;
+
+    vector<int> poly1, poly2, qint(n + 1);
     for(int i = 0; i < n; i++) {
-        int x;
-        cin >> x;
-        x += MAXN;
-        ap[x]++;
-        helper[x]++;
-        gotTwice[2 * x]++;
-    }
+        poly1.push_back( (s[i] == '?') || (s[i] == 'K') );
+        poly2.push_back( (s[i] == '?') || (s[i] == 'K'));
+    }   
+
+    reverse(all(poly1));
+    vector<int> ans = multiply(poly1, poly2);
     
-    vi duple = multiply(ap, helper);
-    vi triple = multiply(ap, duple);
-    gotTwice = multiply(ap, gotTwice);
+    poly1.clear();
+    poly2.clear();
+
+    for(int i = 0; i < n; i++) {
+        poly1.push_back( (s[i] == '?') || (s[i] == 'V'));
+        poly2.push_back( (s[i] == '?') || (s[i] == 'V'));
+    }
+    reverse(all(poly1));
+    poly1 = multiply(poly1, poly2);
+
+    for(int i = 0; i < poly1.size(); i++)
+        ans[i] += poly1[i];
+
+    poly1.clear();
+    poly2.clear();    
+
+    for(int i = 0; i < n; i++) {
+        poly1.push_back( (s[i] == '?') );
+        poly2.push_back( (s[i] == '?') );
+    }
+    reverse(all(poly1));
+    poly1 = multiply(poly1, poly2);
+
+    for(int i = 0; i < poly1.size(); i++)
+        ans[i] -= poly1[i];
+
+    
+    vector<int> ansx;
+    vector<int> valid(n + 1);
+
+    for(int j = 2 * n - 1; j >= n; j--) { 
+        int k = j - n + 1;
+        bool cur = (ans[j] == n - k);
+        for(int x = k + k; x <= n; x += k) 
+            cur &= valid[x];
         
-    for(int i = 0; i < gotTwice.size(); i++) {
-        if(gotTwice[i]) {
-            if( (i - 3 * MAXN) % 3 == 0) {
-                triple[i]--;
-                gotTwice[i]--;
-            }
-            
-            triple[i] = max(triple[i] - 3 * gotTwice[i], 0LL);
-        }
+        if(cur)
+            ansx.push_back(k);
+        valid[k] = cur;
     }
 
-    for(int i = - 3 * MAXN; i + 3 * MAXN < triple.size(); i++) 
-        if(triple[i + 3 * MAXN]/6 > 0)
-            cout << i << " : " << triple[i + 3 * MAXN]/6 << endl;
-    
+    reverse(all(ansx));
+    cout << ansx.size() << endl;
+    for(int &i : ansx)
+        cout << i << " ";
+    cout << endl;
+}
+
+int32_t main() {
+    int ct = 1;
+    cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

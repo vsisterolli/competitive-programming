@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -29,7 +28,7 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 20000;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
@@ -89,37 +88,81 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
     return result;
 }
 
-int32_t main() {
-    int n;
-    cin >> n;
+void solve() {
+    int n, m, k;
+    cin >> n >> m >> k;
+    
+    vector<vector<int>> ap(4, vector<int>(n)), apt(4, vector<int>(m));
 
-    vi ap(2 * MAXN + 5), helper(2 * MAXN + 5), gotTwice(4 * MAXN + 5);
+    string s, t;
+    cin >> s >> t;
     for(int i = 0; i < n; i++) {
-        int x;
-        cin >> x;
-        x += MAXN;
-        ap[x]++;
-        helper[x]++;
-        gotTwice[2 * x]++;
-    }
-    
-    vi duple = multiply(ap, helper);
-    vi triple = multiply(ap, duple);
-    gotTwice = multiply(ap, gotTwice);
-        
-    for(int i = 0; i < gotTwice.size(); i++) {
-        if(gotTwice[i]) {
-            if( (i - 3 * MAXN) % 3 == 0) {
-                triple[i]--;
-                gotTwice[i]--;
-            }
-            
-            triple[i] = max(triple[i] - 3 * gotTwice[i], 0LL);
+        if(s[i] == 'A') {
+            ap[0][i]++;
+            if(i + k + 1 < n)
+                ap[0][i + k + 1]--;
         }
+        else if(s[i] == 'G') {
+            ap[1][i]++;
+            if(i + k + 1 < n)
+                ap[1][i + k + 1]--;
+        }
+        else if(s[i] == 'C') {
+            ap[2][i]++;
+            if(i + k + 1 < n)
+                ap[2][i + k + 1]--;
+        }
+        else {
+            ap[3][i]++;
+            if(i + k + 1 < n)
+                ap[3][i + k + 1]--; 
+        }
+
+        for(int j = 0; j <= 3; j++) 
+            if(i + 1 < n)
+                ap[j][i + 1] += ap[j][i];
     }
 
-    for(int i = - 3 * MAXN; i + 3 * MAXN < triple.size(); i++) 
-        if(triple[i + 3 * MAXN]/6 > 0)
-            cout << i << " : " << triple[i + 3 * MAXN]/6 << endl;
     
+    for(vi &i : ap)
+        for(int j = 0; j < i.size(); j++) {
+            i[j] = max(i[j], i[min((int)i.size() - 1, j + k)]);
+            i[j] = min(1, i[j]);
+        }
+    
+    for(int i = 0; i < m; i++) {
+        if(t[i] == 'A')
+            apt[0][i]++;
+        else if(t[i] == 'G')
+            apt[1][i]++;
+        else if(t[i] == 'C')
+            apt[2][i]++;
+        else
+            apt[3][i]++;    
+    }
+
+    reverse(all(apt[0])); reverse(all(apt[1])); reverse(all(apt[2])); reverse(all(apt[3]));
+    ap[0] = multiply(ap[0], apt[0]);
+    ap[1] = multiply(ap[1], apt[1]);
+    ap[2] = multiply(ap[2], apt[2]);
+    ap[3] = multiply(ap[3], apt[3]);
+
+    int ans = 0;
+    for(int i = m - 1; i < (n - m) + m; i++) {
+        debug4(ap[0][i], ap[1][i], ap[2][i], ap[3][i]); 
+        if(ap[0][i] + ap[1][i] + ap[2][i] + ap[3][i] == m)
+            ans++;
+
+    }
+
+    cout << ans << endl;
+}
+
+int32_t main() {
+    FAST;
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

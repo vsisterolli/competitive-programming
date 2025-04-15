@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -29,7 +28,7 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 20000;
+const ll mod = 1e9 + 7, MAXN = 2e6 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
@@ -90,36 +89,30 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
 }
 
 int32_t main() {
+    FAST;
     int n;
     cin >> n;
-
-    vi ap(2 * MAXN + 5), helper(2 * MAXN + 5), gotTwice(4 * MAXN + 5);
+    vector<int> ap(MAXN), helper(MAXN);
     for(int i = 0; i < n; i++) {
         int x;
         cin >> x;
-        x += MAXN;
         ap[x]++;
         helper[x]++;
-        gotTwice[2 * x]++;
-    }
-    
-    vi duple = multiply(ap, helper);
-    vi triple = multiply(ap, duple);
-    gotTwice = multiply(ap, gotTwice);
-        
-    for(int i = 0; i < gotTwice.size(); i++) {
-        if(gotTwice[i]) {
-            if( (i - 3 * MAXN) % 3 == 0) {
-                triple[i]--;
-                gotTwice[i]--;
-            }
-            
-            triple[i] = max(triple[i] - 3 * gotTwice[i], 0LL);
-        }
     }
 
-    for(int i = - 3 * MAXN; i + 3 * MAXN < triple.size(); i++) 
-        if(triple[i + 3 * MAXN]/6 > 0)
-            cout << i << " : " << triple[i + 3 * MAXN]/6 << endl;
-    
+    reverse(all(helper));
+    ap = multiply(ap, helper);
+
+    for(int i = 1; i < MAXN; i++) {
+        bool deu = true;
+        for(int j = i + helper.size() - 1; j < ap.size(); j += i) {
+            deu &= (!ap[j]);
+            if(!deu)
+                break;
+        }
+        if(deu) {
+            cout << i << endl;
+            return 0;
+        }
+    }
 }

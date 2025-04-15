@@ -90,36 +90,28 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
 }
 
 int32_t main() {
-    int n;
-    cin >> n;
-
-    vi ap(2 * MAXN + 5), helper(2 * MAXN + 5), gotTwice(4 * MAXN + 5);
+    int n, x;
+    cin >> n >> x;
+    vector<int> v(n);
     for(int i = 0; i < n; i++) {
-        int x;
-        cin >> x;
-        x += MAXN;
-        ap[x]++;
-        helper[x]++;
-        gotTwice[2 * x]++;
+        cin >> v[i]; 
+        v[i] = (v[i] < x);
     }
     
-    vi duple = multiply(ap, helper);
-    vi triple = multiply(ap, duple);
-    gotTwice = multiply(ap, gotTwice);
-        
-    for(int i = 0; i < gotTwice.size(); i++) {
-        if(gotTwice[i]) {
-            if( (i - 3 * MAXN) % 3 == 0) {
-                triple[i]--;
-                gotTwice[i]--;
-            }
-            
-            triple[i] = max(triple[i] - 3 * gotTwice[i], 0LL);
-        }
+    int cur = 0;
+    vi ap(n + 1), rap(n+1);
+    
+    ap[cur]++, rap[cur]++;
+    for(int i = 0; i < n; i++) {
+        cur += v[i];
+        ap[cur]++;
+        rap[cur]++;
     }
+    reverse(all(rap));
+    ap = multiply(ap, rap);
 
-    for(int i = - 3 * MAXN; i + 3 * MAXN < triple.size(); i++) 
-        if(triple[i + 3 * MAXN]/6 > 0)
-            cout << i << " : " << triple[i + 3 * MAXN]/6 << endl;
-    
+    cout << (ap[n] - n)/2 << " ";  
+    for(int i = n + 1; i <= 2 * n; i++)
+        cout << ap[i] << " ";
+    cout << endl;
 }

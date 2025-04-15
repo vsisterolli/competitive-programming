@@ -29,7 +29,7 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 20000;
+const ll mod = 200003, MAXN = 20000;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
@@ -92,34 +92,19 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
 int32_t main() {
     int n;
     cin >> n;
+    vector<int> v(n + 1);
+    for(int i = 1; i <= n; i++) 
+        cin >> v[i];
 
-    vi ap(2 * MAXN + 5), helper(2 * MAXN + 5), gotTwice(4 * MAXN + 5);
-    for(int i = 0; i < n; i++) {
-        int x;
-        cin >> x;
-        x += MAXN;
-        ap[x]++;
-        helper[x]++;
-        gotTwice[2 * x]++;
-    }
-    
-    vi duple = multiply(ap, helper);
-    vi triple = multiply(ap, duple);
-    gotTwice = multiply(ap, gotTwice);
-        
-    for(int i = 0; i < gotTwice.size(); i++) {
-        if(gotTwice[i]) {
-            if( (i - 3 * MAXN) % 3 == 0) {
-                triple[i]--;
-                gotTwice[i]--;
-            }
-            
-            triple[i] = max(triple[i] - 3 * gotTwice[i], 0LL);
-        }
-    }
+    vi aux(all(v));
+    vi poly = multiply(v, aux);
 
-    for(int i = - 3 * MAXN; i + 3 * MAXN < triple.size(); i++) 
-        if(triple[i + 3 * MAXN]/6 > 0)
-            cout << i << " : " << triple[i + 3 * MAXN]/6 << endl;
-    
+    int ans = 0;
+    for(int i = 2; i <= 2 * n; i++) {
+        if(i % 2 == 0)
+            poly[i] -= (v[i/2] * v[i/2]);
+        ans += ( (poly[i]/2)%mod + ans);
+    }
+    cout << ans << endl;
+
 }

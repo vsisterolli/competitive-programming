@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -18,6 +17,7 @@
 #define debug4(x, y, z, o) cerr << "DEBUG " << x << " " << y << " " << z << " " << o << endl
 #define all(x) x.begin(), x.end()
 #define left esquerda
+#define int long long
 #define lb lower_bound
 #define right direita
 using namespace std;
@@ -29,7 +29,7 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 20000;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
@@ -90,36 +90,41 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
 }
 
 int32_t main() {
-    int n;
-    cin >> n;
+    FAST;
+    int n, m, k;
+    cin >> n >> m >> k;
 
-    vi ap(2 * MAXN + 5), helper(2 * MAXN + 5), gotTwice(4 * MAXN + 5);
+    vector<int> ap(n + 1);
     for(int i = 0; i < n; i++) {
         int x;
         cin >> x;
-        x += MAXN;
         ap[x]++;
-        helper[x]++;
-        gotTwice[2 * x]++;
-    }
-    
-    vi duple = multiply(ap, helper);
-    vi triple = multiply(ap, duple);
-    gotTwice = multiply(ap, gotTwice);
-        
-    for(int i = 0; i < gotTwice.size(); i++) {
-        if(gotTwice[i]) {
-            if( (i - 3 * MAXN) % 3 == 0) {
-                triple[i]--;
-                gotTwice[i]--;
-            }
-            
-            triple[i] = max(triple[i] - 3 * gotTwice[i], 0LL);
-        }
     }
 
-    for(int i = - 3 * MAXN; i + 3 * MAXN < triple.size(); i++) 
-        if(triple[i + 3 * MAXN]/6 > 0)
-            cout << i << " : " << triple[i + 3 * MAXN]/6 << endl;
-    
+    priority_queue<pii, vector<pii>, greater<pii>> q;
+    vector<vi> polys;
+
+    for(int i = 1; i <= n; i++) {
+        vector<int> poly;
+        if(ap[i])
+            for(int j = 0; j <= ap[i]; j++)
+                poly.push_back(1);
+
+        if(poly.size())
+            q.push({poly.size(), polys.size()});
+        polys.push_back(poly);
+    }
+
+    while(q.size() > 1) {
+        pii nxt = q.top(); q.pop();
+        pii nxt2 = q.top(); q.pop();
+
+        polys[nxt.s] = multiply(polys[nxt.s], polys[nxt2.s]);
+        for(int &i : polys[nxt.s])
+            i %= 1009;
+        q.push({polys[nxt.s].size(), nxt.s});
+    }
+
+    pii ans = q.top(); q.pop();
+    cout << polys[ans.s][k] % 1009 << endl;
 }
