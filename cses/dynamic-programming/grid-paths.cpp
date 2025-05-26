@@ -8,9 +8,9 @@
 #define ll long long
 #define f first
 #define fin cin
-#define int long long
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -29,51 +29,44 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 7e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-bool divisor[MAXN];
-vector<int> primes;
-
-void sieve() {
-    for(int i = 2; i < MAXN; i++)
-        if(!divisor[i]) {
-            primes.push_back(i);
-            for(int j = i + i; j < MAXN; j += i)
-                divisor[j] = 1;
-        }
-}
-
 void solve() {
-    int n, m;
-    cin >> n >> m;
+    int n;
+    cin >> n;
 
-    int N = primes.size();
+    vector<string> grid;
+    for(int i = 0; i < n; i++) {
+        string s;
+        cin >> s;
+        grid.push_back(s);
+    }
 
-    int dp[N + 5][n + 5];
+    int dp[n][n];
     memset(dp, 0, sizeof dp);
-    
-    for (int i = 0; i <= n; i++) { dp[0][i] = 1; }
+    dp[0][0] = (grid[0][0] == '.');
 
-    for(int i = 1; i <= N; i++)
-        for(int j = 0; j <= n; j++) {
-            dp[i][j] = dp[i - 1][j];
+    vector<pii> order;
+    for(int sum = 0; sum <= 2 * n; sum++)
+        for(int i = 0; i <= sum; i++) 
+            if(i < n && sum - i < n)
+                order.push_back({i, sum - i});
+        
 
-            int p = primes[i - 1];
-            while(p <= j) {
-                dp[i][j] = (dp[i][j] + (dp[i - 1][j - p] * p)%m)%m;
-                p = (p * primes[i - 1])%m;
-            }
-
-        }
-
-    cout << dp[N][n] << endl;
+    for(int i = 0; i < order.size(); i++) {
+        pii cur = order[i];
+        dp[cur.f][cur.s] %= mod;
+        if(cur.f + 1 < n && grid[cur.f + 1][cur.s] != '*')
+            dp[cur.f + 1][cur.s] += dp[cur.f][cur.s];
+        if(cur.s + 1 < n && grid[cur.f][cur.s + 1] != '*')
+            dp[cur.f][cur.s + 1] += dp[cur.f][cur.s];
+    }
+    cout << dp[n - 1][n - 1] % mod << endl;
 }
 
 int32_t main() {
-    setIO("exercise");
-    sieve();
     int ct = 1;
     // cin >> ct;
     while(ct--)

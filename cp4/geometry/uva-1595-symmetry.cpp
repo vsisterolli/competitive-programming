@@ -8,7 +8,6 @@
 #define ll long long
 #define f first
 #define fin cin
-#define int long long
 #define fout cout
 #define s second
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
@@ -29,53 +28,36 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 7e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-bool divisor[MAXN];
-vector<int> primes;
-
-void sieve() {
-    for(int i = 2; i < MAXN; i++)
-        if(!divisor[i]) {
-            primes.push_back(i);
-            for(int j = i + i; j < MAXN; j += i)
-                divisor[j] = 1;
-        }
-}
-
 void solve() {
-    int n, m;
-    cin >> n >> m;
-
-    int N = primes.size();
-
-    int dp[N + 5][n + 5];
-    memset(dp, 0, sizeof dp);
+    int n;
+    cin >> n;
     
-    for (int i = 0; i <= n; i++) { dp[0][i] = 1; }
+    vector<pii> v(n);
+    for(int i = 0; i < n; i++) 
+        cin >> v[i].f >> v[i].s;
+    sort(all(v));
 
-    for(int i = 1; i <= N; i++)
-        for(int j = 0; j <= n; j++) {
-            dp[i][j] = dp[i - 1][j];
-
-            int p = primes[i - 1];
-            while(p <= j) {
-                dp[i][j] = (dp[i][j] + (dp[i - 1][j - p] * p)%m)%m;
-                p = (p * primes[i - 1])%m;
+    map<int, int> mapa;
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            if(v[i].s == v[j].s) {
+                mapa[v[j].f + v[i].f]++;
+                if(mapa[v[j].f + v[i].f] == n) {
+                    cout << "YES" << endl;
+                    return;
+                }
             }
-
-        }
-
-    cout << dp[N][n] << endl;
+    cout << "NO" << endl;
 }
 
 int32_t main() {
-    setIO("exercise");
-    sieve();
+    FAST;
     int ct = 1;
-    // cin >> ct;
+    cin >> ct;
     while(ct--)
         solve();
     return 0;

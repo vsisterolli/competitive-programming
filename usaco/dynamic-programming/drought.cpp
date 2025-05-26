@@ -8,9 +8,9 @@
 #define ll long long
 #define f first
 #define fin cin
-#define int long long
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -29,54 +29,46 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 7e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-bool divisor[MAXN];
-vector<int> primes;
+int32_t main() {
+    int n;
+    cin >> n;
+    vector<int> v(n);
 
-void sieve() {
-    for(int i = 2; i < MAXN; i++)
-        if(!divisor[i]) {
-            primes.push_back(i);
-            for(int j = i + i; j < MAXN; j += i)
-                divisor[j] = 1;
-        }
-}
+    int mn = 1000;
+    for(int i = 0; i < n; i++) {
+        cin >> v[i];
+        mn = min(mn, v[i]);
+    }
+    // if(n == 1) {
+    //     cout << v[0] + 1 << endl;
+    //     return;
+    // }
 
-void solve() {
-    int n, m;
-    cin >> n >> m;
-
-    int N = primes.size();
-
-    int dp[N + 5][n + 5];
+    int ans = 0;
+    
+    int dp[n][1005];
     memset(dp, 0, sizeof dp);
     
-    for (int i = 0; i <= n; i++) { dp[0][i] = 1; }
-
-    for(int i = 1; i <= N; i++)
-        for(int j = 0; j <= n; j++) {
-            dp[i][j] = dp[i - 1][j];
-
-            int p = primes[i - 1];
-            while(p <= j) {
-                dp[i][j] = (dp[i][j] + (dp[i - 1][j - p] * p)%m)%m;
-                p = (p * primes[i - 1])%m;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j <= v[i] - mn; j++) {
+            if(!i)
+                dp[i][j] = j;
+            if(i == n - 1) {
+                dp[i][j] = dp[i - 1][j];
+                ans += dp[i][j];
             }
-
+            else dp[i][j] = (j ? dp[i][j - 1] : 0) + dp[i - 1][v[i] - mn - j];
         }
+    }
 
-    cout << dp[N][n] << endl;
-}
+    for(int rmv = mn - 1; rmv >= 0; rmv--) {
+        for(int i = 1; i < n; i++)
+            dp[i][v[i] - [rmv]]
 
-int32_t main() {
-    setIO("exercise");
-    sieve();
-    int ct = 1;
-    // cin >> ct;
-    while(ct--)
-        solve();
-    return 0;
+    }
+
 }

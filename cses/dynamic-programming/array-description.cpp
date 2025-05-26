@@ -8,9 +8,9 @@
 #define ll long long
 #define f first
 #define fin cin
-#define int long long
 #define fout cout
 #define s second
+#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -29,51 +29,51 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 7e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
-
-bool divisor[MAXN];
-vector<int> primes;
-
-void sieve() {
-    for(int i = 2; i < MAXN; i++)
-        if(!divisor[i]) {
-            primes.push_back(i);
-            for(int j = i + i; j < MAXN; j += i)
-                divisor[j] = 1;
-        }
-}
 
 void solve() {
     int n, m;
     cin >> n >> m;
 
-    int N = primes.size();
+    vector<int> v(n);
+    for(int &i : v)
+        cin >> i;
 
-    int dp[N + 5][n + 5];
+    int dp[n + 1][m + 1];
     memset(dp, 0, sizeof dp);
-    
-    for (int i = 0; i <= n; i++) { dp[0][i] = 1; }
 
-    for(int i = 1; i <= N; i++)
-        for(int j = 0; j <= n; j++) {
-            dp[i][j] = dp[i - 1][j];
-
-            int p = primes[i - 1];
-            while(p <= j) {
-                dp[i][j] = (dp[i][j] + (dp[i - 1][j - p] * p)%m)%m;
-                p = (p * primes[i - 1])%m;
-            }
-
+    int ans = 0;
+    for(int i = 0; i < n; i++) {
+        if(v[i]) {
+            if(!i)
+                dp[i][v[i]] = 1;
+            else
+                dp[i][v[i]] = (dp[i - 1][v[i]] + dp[i - 1][v[i] - 1] + dp[i - 1][v[i] + 1])%mod;
+            if(i == n - 1)
+                ans += dp[i][v[i]];
         }
+        else
+            for(int j = 1; j <= m; j++) {
+                if(!i)
+                    dp[i][j] = 1;
 
-    cout << dp[N][n] << endl;
+                else
+                    dp[i][j] = (dp[i - 1][j] + dp[i - 1][j + 1] + dp[i - 1][j - 1])%mod;
+                
+                if(i == n - 1)
+                    ans = (ans + dp[i][j])%mod;
+            }
+    }
+    cout << ans << endl;
+
+    
+
+    
 }
 
 int32_t main() {
-    setIO("exercise");
-    sieve();
     int ct = 1;
     // cin >> ct;
     while(ct--)

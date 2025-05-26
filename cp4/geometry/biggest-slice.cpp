@@ -8,7 +8,6 @@
 #define ll long long
 #define f first
 #define fin cin
-#define int long long
 #define fout cout
 #define s second
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
@@ -26,56 +25,56 @@ void setIO(string s) {
     freopen((s+".in").c_str(),"r",stdin);
     freopen((s+".out").c_str(),"w",stdout);
 }
-typedef pair<ll, ll> pii;
+typedef pair<double, double> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 7e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-bool divisor[MAXN];
-vector<int> primes;
-
-void sieve() {
-    for(int i = 2; i < MAXN; i++)
-        if(!divisor[i]) {
-            primes.push_back(i);
-            for(int j = i + i; j < MAXN; j += i)
-                divisor[j] = 1;
-        }
-}
-
 void solve() {
-    int n, m;
-    cin >> n >> m;
+    int r, n, a, m, s;
+    cin >> r >> n >> a >> m >> s;
+    a *= 3600;
+    m *= 60;
+    m += s;
+    a += m;
 
-    int N = primes.size();
+    const int tot = 1296000;
+    int aux = 0;
 
-    int dp[N + 5][n + 5];
-    memset(dp, 0, sizeof dp);
+    vector<bool> ap(tot + 5);
+    ap[0] = 1;
+    int last = 0;
+    for(int i = 0; i < n - 1; i++) {
+        aux += a;
+        if(aux >= tot)
+            aux -= tot;
+        if(ap[aux])
+            break;
+        ap[aux] = 1;
+    }
+
+
+    double ans = 0;
+    for(int i = 0; i < tot; i++) {
+        if(!ap[i])
+            continue;
+        
+        int dist = abs(i - last);
+        last = i;
+        ans = max(ans, r * r * M_PI * (double)dist/double(tot));
+    }
+    int dist = tot - last;
+    ans = max(ans, r * r * M_PI * (double)dist/double(tot));
     
-    for (int i = 0; i <= n; i++) { dp[0][i] = 1; }
-
-    for(int i = 1; i <= N; i++)
-        for(int j = 0; j <= n; j++) {
-            dp[i][j] = dp[i - 1][j];
-
-            int p = primes[i - 1];
-            while(p <= j) {
-                dp[i][j] = (dp[i][j] + (dp[i - 1][j - p] * p)%m)%m;
-                p = (p * primes[i - 1])%m;
-            }
-
-        }
-
-    cout << dp[N][n] << endl;
+    cout << fixed << setprecision(6) << ans << endl;
 }
 
 int32_t main() {
-    setIO("exercise");
-    sieve();
+    FAST;
     int ct = 1;
-    // cin >> ct;
+    cin >> ct;
     while(ct--)
         solve();
     return 0;

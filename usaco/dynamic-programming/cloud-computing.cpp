@@ -8,7 +8,6 @@
 #define ll long long
 #define f first
 #define fin cin
-#define int long long
 #define fout cout
 #define s second
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
@@ -29,54 +28,48 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 7e5 + 5;
+const ll mod = 1e9 + 7, MAXN = 1e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-bool divisor[MAXN];
-vector<int> primes;
-
-void sieve() {
-    for(int i = 2; i < MAXN; i++)
-        if(!divisor[i]) {
-            primes.push_back(i);
-            for(int j = i + i; j < MAXN; j += i)
-                divisor[j] = 1;
-        }
-}
-
-void solve() {
-    int n, m;
-    cin >> n >> m;
-
-    int N = primes.size();
-
-    int dp[N + 5][n + 5];
-    memset(dp, 0, sizeof dp);
-    
-    for (int i = 0; i <= n; i++) { dp[0][i] = 1; }
-
-    for(int i = 1; i <= N; i++)
-        for(int j = 0; j <= n; j++) {
-            dp[i][j] = dp[i - 1][j];
-
-            int p = primes[i - 1];
-            while(p <= j) {
-                dp[i][j] = (dp[i][j] + (dp[i - 1][j - p] * p)%m)%m;
-                p = (p * primes[i - 1])%m;
-            }
-
-        }
-
-    cout << dp[N][n] << endl;
-}
+ll dp[MAXN + 2][2];
 
 int32_t main() {
-    setIO("exercise");
-    sieve();
-    int ct = 1;
-    // cin >> ct;
-    while(ct--)
-        solve();
-    return 0;
+    int n;
+    cin >> n;
+
+    vector<array<int, 3>> v(n);
+    for(int i = 0; i < n; i++) {
+        cin >> v[i][0] >> v[i][1] >> v[i][2];
+        v[i][2] = -v[i][2];
+    }
+
+    int m;
+    cin >> m;
+    v.resize(n + m);
+    for(int i = n; i < n + m; i++) {
+        cin >> v[i][0] >> v[i][1] >> v[i][2];
+        v[i][0] = -v[i][0];
+    }
+
+    for(int j = 0; j < MAXN; j++)
+        dp[j][0] = dp[j][1] = -LINF;
+
+    ll ans = 0;
+    sort(all(v), [&](array<int, 3> a, array<int, 3> b) -> bool {
+        return a[1] > b[1];
+    });
+    
+    dp[0][0] = 0;
+    for(int i = 0; i < n + m; i++)
+        for(int j = 0; j < MAXN; j++) {
+            dp[j][!(i & 1)] = max(dp[j][!(i & 1)], dp[j][i & 1]);
+            if(j + v[i][0] < MAXN && j + v[i][0] >= 0) {
+                dp[j + v[i][0]][!(i & 1)] = max(dp[j + v[i][0]][!(i & 1)], dp[j][i & 1] + v[i][2]);
+                ans = max(ans, dp[j + v[i][0]][!(i & 1)]);
+            }
+            ans = max({ans, dp[j][!(i & 1)], dp[j][i & 1]}); 
+        }
+    cout << ans << endl;
+        
 }

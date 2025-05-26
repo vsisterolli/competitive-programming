@@ -1,0 +1,8 @@
+Triangular Inequality N sides
+sum of all sides except the biggest one < biggest side
+
+Area of Triangles
+sqrt(s(s - a)(s - b)(s - c))
+equilateral: sqrt(3)/4 * side²
+1/2 a * b * sin(C)
+three vertex: determinant of matrix (xi, yi, 1)
