@@ -1,11 +1,12 @@
 Linear sieve + mobius:
 void sieve() {
-    vector<int> primes, lp(MAXN), mobius(MAXN);
+    vector<int> primes, lp(MAXN), mobius(MAXN), phi(MAXN);
     mobius[1] = 1;
     for(int i = 2; i < MAXN; i++) {
         if(!lp[i]) {
             lp[i] = i;
             mobius[i] = -1;
+            phi[i] = i - 1;
             primes.push_back(i);
         }
 
@@ -14,9 +15,13 @@ void sieve() {
                 break;
 
             lp[j * i] = j;
-            if(lp[i] == j)
+            
+            if(lp[i] == j) {
+                phi[j * i] = phi[i] * j;
                 break;
+            }
 
+            phi[j * i] = phi[i] * phi[j];
             mobius[j * i] = -mobius[i];
         }
     }
@@ -52,6 +57,53 @@ array<int, 3> euclides(int a, int b) {
     return {prev[1], prev[0] - (a / b) * prev[1], prev[2]};
 }
 
+Chinese Remainder Theorem
+Gives solution to system of equations:
+A = A1 mod m1
+A = A2 mod m2
+...
+
+Condition: A1 = A2 mod gcd(m1, m2);
+
+By bezout theorem we have:
+m1p + m2q = g
+m1p = g mod m2
+
+a2m1p/g = a2 mod m2
+Similar:
+a1m2q/g = a1 mod m1
+
+So, a = a1m2q/g + a2m1p/g mod LCM(m1, m2)
+
+int crt(vector<int> &A, vector<int> &M) {
+
+    if(!A.size() || A.size() != M.size())
+        return -1;
+    
+    int a = A[0], m = M[0], n = A.size();
+    for(int i = 1; i < n; i++) {
+
+        array<int, 3> sol = euclides(m, M[i]);
+        if( (a % sol[2]) != (A[i] % sol[2]) )
+            return -1;
+
+        int nMod = ((__int128_t)m * M[i]) / sol[2];
+
+        int p1 = ((__int128_t) a * (M[i]/sol[2]) ) % nMod;
+        p1 = ((__int128_t) p1 * sol[1]) % nMod;
+   
+        int p2 = ((__int128_t)A[i] * (m/sol[2])) %nMod;
+        p2 = ((__int128_t)p2 * sol[0]) % nMod;
+    
+        a = (p1 + p2) % nMod;
+        if (a < 0) a += nMod;
+        m = nMod;
+    }
+
+    return a;
+}
+
+
 Sum of Divisors of N
 
 Let N = P^k * Q'^z where p and q are primes
@@ -72,36 +124,6 @@ while(n > 1) {
         ans += sum * aux;
     }
 }
-
-Multionmial (n | k1, k2, k3, ..., kn)
-Ways of dividing N into sets of size k1, k2, k3, ..., kn such that k1 + k2 + ... + kn = N
-= n1!/(k1! * k2! * k3! * k4!!)
-
-Dearrangements
-Number of permutations where no element keeps its original position
--> Use inclusion-exclusion prinicipial or
-
-f(n) = {
-    0, n = 1
-    1, n = 2
-    (n - 1)(f(n - 2) + f(n - 1)), n > 2
-}
-
-
-Burnside lemma:
-The number of objects equals the average of simmetrycal pictures for every simmetries
-
-The problem example is coloring a 3x3 table, and if a table is equal to the other one by rotating it, they are the same
-There are 5^9 simmetries for rotating 0 degrees, 5^3 90 degrees, 5^5 180 degrees and 5^3 270 degrees so the total number of pictures is
-(5^9 + 5^3 + 5^5 + 5^3)/4, just see how many squares are free and how many are determined by simmetry
-
-Hockey Sticky Identity
-Summatory(k = r -> n) of C(k, r) = C(n + 1, r + 1);
-Example: n = 10, r = 5 -> C(5, 5) + C(6, 5) + C(7, 5) + C(8, 5) + C(9, 5) + C(10, 5) = C(11, 6);
-
-Also, from simmetry: C(4, 0) = C(4, 4) so:
-C(4, 0) + C(5, 1) + C(6, 2) + C(7, 3) + C(8, 4) + C(9, 5) = C(10, 5) =
-C(4, 4) + C(5, 4) + C(6, 4) + ... + C(8, 4) + C(9, 4) = C(10, 5);
 
 Chicken Mcnugget Theorem 
 Let M, N be coprimes, for any integer a and b
@@ -143,3 +165,92 @@ Cn = sum of C[n - k] * C[k] from k = 0 to n
 Formula:
 Cn = (2n, n) * 1/(n + 1);
 
+Hockey Sticky Identity
+Summatory(k = r -> n) of C(k, r) = C(n + 1, r + 1);
+Example: n = 10, r = 5 -> C(5, 5) + C(6, 5) + C(7, 5) + C(8, 5) + C(9, 5) + C(10, 5) = C(11, 6);
+
+Also, from simmetry: C(4, 0) = C(4, 4) so:
+C(4, 0) + C(5, 1) + C(6, 2) + C(7, 3) + C(8, 4) + C(9, 5) = C(10, 5) =
+C(4, 4) + C(5, 4) + C(6, 4) + ... + C(8, 4) + C(9, 4) = C(10, 5);
+
+Weighted sum:
+1 * C(n, 1) + 2 * C(n, 2) + 3 * C(n, 3) + ... + n * C(n, n) = n * (2^(n - 1))
+
+Sum of the squares:
+C(n, 0)² + C(n, 1)² + C(n, 2)² + ... + C(n, n)² = C(2n, n);
+
+Multionmial (n | k1, k2, k3, ..., kn)
+Ways of dividing N into sets of size k1, k2, k3, ..., kn such that k1 + k2 + ... + kn = N
+= n1!/(k1! * k2! * k3! * k4!!)
+
+Dearrangements
+Number of permutations where no element keeps its original position
+-> Use inclusion-exclusion prinicipial or
+
+f(n) = {
+    0, n = 1
+    1, n = 2
+    (n - 1)(f(n - 2) + f(n - 1)), n > 2
+}
+
+Burnside lemma:
+The number of objects equals the average of simmetrycal pictures for every simmetries
+
+The problem example is coloring a 3x3 table, and if a table is equal to the other one by rotating it, they are the same
+There are 5^9 simmetries for rotating 0 degrees, 5^3 90 degrees, 5^5 180 degrees and 5^3 270 degrees so the total number of pictures is
+(5^9 + 5^3 + 5^5 + 5^3)/4, just see how many squares are free and how many are determined by simmetry
+
+Lucas Theorem:
+Let M = a0 * p^0 + a1 * p^1 + ... + ak * p^k 
+and N = b0 * p^0 + b1 * p^1 + ... + bk * p^k
+C(N, M) = C(A0, B0) * C(A1, B1) * C(A2, B2) * ... * C(AN, BN) mod p
+
+Fibonacci Numbers:
+Fn-1 * Fn+1 - F²n = (-1)^n
+Fn+k = Fk * Fn+1 + Fk-1 * Fn
+F2n = Fn(Fn+1 + Fn-1)
+
+Which implies that Fnk is multiple of Fn
+
+GCD(Fm, Fn) = Fgcd(m, n)
+
+Fibonacci Coding
+
+Since Fn > Sum of all previous Fk, fibonacci coding is possible
+N = Fk1 + Fk2 + Fk3 + ... + Fkn
+
+Periodicity Modulo P (Pisano Period):
+
+pi(mn) where mn is coprime = lcm(pi(m), pi(n))
+pi(p^k) = p^(k - 1) pi(p) except for p = 2 and p = 5
+pi(2^k) = 3 * 2^(k - 1)
+pi(5^k) = 4 * 5^k
+
+pi(p) | (p² - 1) if p = +-1 mod 10
+pi(p) | 2(p + 1) if p = +-3 mod 10
+
+Consideing pi(p) = p² - 1 or 2(p + 1) works because you are simply repeting the cycle pi(p)/2(p + 1) times.
+
+All values of floor(n/i):
+
+int cur = n;
+
+do {
+    int val = n/cur;
+    xd.push_back(val);
+
+    int j = n/(val + 1);
+    cur = j;
+} while(cur != 1);
+xd.push_back(n);
+
+All values of ceil(n/i):
+
+xd.push_back(1);
+while(cur != 1) {
+    int val = (n + cur - 1)/cur;
+    int j = (n + val - 1)/val - 1;
+
+    cur = j;
+    xd.push_back( (n + j - 1)/j);
+}
