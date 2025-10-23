@@ -33,43 +33,49 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
+void solve() {
     int n;
     cin >> n;
-    vector<int> v(n);
 
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
+    bool mat[n][n];
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            cin >> mat[i][j];
     
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
+    int mx = (1<<n) ;
     
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
-
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
-
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
-            }
-
-        ans = (ans + dp[0][0])%mod;
+    vector<vector<int>> qbits(n + 1);
+    for(int i = 0; i < mx; i++) {
+        int bits = __builtin_popcount(i);
+        qbits[bits].push_back(i);
     }
 
-    cout << ans << endl;
+    int dp[mx];
+    memset(dp, 0, sizeof dp);
+
+    dp[0] = 1;
+    for(int i = 0; i < n; i++) {
+        
+        for(int &j : qbits[i + 1]) {
+            
+            int aux = j;
+            for(int x = j; x; x ^= (x & (-x))) {
+                int lsb = __builtin_ctz(x);
+                if(mat[i][lsb])
+                    dp[aux] = (dp[aux ^ (x & (-x))] + dp[aux])%mod;
+            }
+
+        }
+
+    }
+
+    cout << dp[mx - 1] << endl;
+}
+
+int32_t main() {
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

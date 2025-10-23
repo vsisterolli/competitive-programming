@@ -33,43 +33,43 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
-    int n;
-    cin >> n;
-    vector<int> v(n);
-
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
-    
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
-    
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
-
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
-
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
-            }
-
-        ans = (ans + dp[0][0])%mod;
+void solve() {
+    int n, p, k;
+    cin >> n >> p >> k;
+    vector<pii> v(n);
+    for(int i = 0; i < n; i++) {
+        cin >> v[i].f;
+        v[i].s = i;
     }
+    
+    vector<vector<int>> s(n, vector<int>(p));
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < p; j++)
+            cin >> s[i][j];
+    sort(all(v), greater<pii>());        
 
-    cout << ans << endl;
+    int mx = (1<<p);
+    vector<vector<int>> dp(n + 1, vector<int>(mx, -1e18));
+    dp[0][0] = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < mx; j++) {
+            for(int k = 0; k < p; k++) {
+                if((1<<k) & j)
+                    continue;
+            
+                dp[i + 1][j | (1<<k)] = max(dp[i + 1][j | (1<<k)], dp[i][j] + s[v[i].s][k]);
+            }
+            int need = k - i + __builtin_popcount(j);
+            dp[i + 1][j] = max(dp[i + 1][j], dp[i][j] + (need > 0) * v[i].f);
+        }
+    }
+    cout << dp[n][mx - 1] << endl;
+}
+
+int32_t main() {
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

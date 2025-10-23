@@ -33,43 +33,51 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
-    int n;
-    cin >> n;
-    vector<int> v(n);
+void solve() {
+    int n, a, b;
+    cin >> n >> a >> b;
 
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
+    vector<array<int, 3>> f(n);
+    for(auto &i : f) 
+        cin >> i[1] >> i[2] >> i[0];
     
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
-    
+    sort(all(f));
+
+    int dp[n + 1][a + b + 1];
+    memset(dp, 0, sizeof dp); 
+
     int ans = 0;
-    for(int x = mn; x >= 0; x--) {
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j <= a + b; j++) {
+            dp[i + 1][j] = max(dp[i + 1][j], dp[i][j]);
+            
+            auto [x, p, c] = f[i];
 
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
+            int have = b - j;
+            if(have >= x * c) 
+                dp[i + 1][j + x * c] = max(dp[i + 1][j + x * c], dp[i][j] + p);
 
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
+            else {
+                if(have >= 0)
+                    c -= have/x;
+
+                if(max(b, j) + c <= a + b)
+                    dp[i + 1][max(b, j) + c] = max(dp[i + 1][max(b, j) + c], dp[i][j] + p);
             }
+                
+            ans = max(ans, dp[i][j]);
+        }
 
-        ans = (ans + dp[0][0])%mod;
-    }
+    for(int i = 0; i <= a + b; i++)
+        ans = max(ans, dp[n][i]);
 
     cout << ans << endl;
+}
+
+int32_t main() {
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

@@ -33,43 +33,32 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
-    int n;
-    cin >> n;
-    vector<int> v(n);
+void solve() {
+    int n, m, k;
+    cin >> n >> m >> k;
 
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
-    
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
-    
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
+    vector<int> dp(n + 1);
+    dp[n - k + 1] = m;
+    dp[n] = m;
 
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
+    for(int i = n - k; i >= 1; i--) {
+        int first = 1;
+        for(int j = k; j >= 1; j--) {
+            dp[i] = (dp[i] + (dp[i + j] * (m - !first))%mod )%mod;
+            if(dp[i + j])
+                first = 0;
+        }
 
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
-            }
-
-        ans = (ans + dp[0][0])%mod;
     }
 
-    cout << ans << endl;
+    cout << dp[1] << endl;
+}
+
+int32_t main() {
+    setIO("spainting");
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

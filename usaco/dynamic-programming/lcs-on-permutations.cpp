@@ -33,43 +33,39 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
+void solve() {
     int n;
     cin >> n;
+
     vector<int> v(n);
+    vector<vector<int>> dp(515, vector<int>(2, 1e9));
+    dp[0][0] = 0;
 
-    for(int i = 0; i < n; i++) 
+    for(int i = 0; i < n; i++) {
         cin >> v[i];
-    
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
-    
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
-
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
-
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
-            }
-
-        ans = (ans + dp[0][0])%mod;
+        for(int j = 514; j >= 0; j--) {
+            dp[j][!(i & 1)] = min(dp[j][!(i & 1)], dp[j][i & 1]);
+            if(v[i] > dp[j][i & 1])
+                dp[j ^ v[i]][!(i & 1)] = min(dp[j ^ v[i]][i & 1], v[i]);
+        }
     }
 
+    int ans = 0;
+    for(int i = 0; i < 515; i++)
+        if(dp[i][n & 1] < 1e9) 
+            ans++;
     cout << ans << endl;
+    for(int i = 0; i < 515; i++)
+        if(dp[i][n & 1] < 1e9) {
+            cout << i << " ";
+        }
+    
+}
+
+int32_t main() {
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

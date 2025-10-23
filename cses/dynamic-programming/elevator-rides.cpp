@@ -34,42 +34,37 @@ typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
 int32_t main() {
-    int n;
-    cin >> n;
+    int n, x;
+    cin >> n >> x;
     vector<int> v(n);
-
-    for(int i = 0; i < n; i++) 
+    for(int i = 0; i < n; i++)
         cin >> v[i];
-    
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
-    
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
 
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
 
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
+    int mx = (1<<n);
+
+    pii dp[mx];
+
+    dp[0] = {0, 0};
+    for(int i = 1; i < mx; i++) {
+        int aux = i;
+        dp[i] = {1e9, 1e9};
+        while(aux) {
+            
+            int bit = (aux & (-aux));
+            aux ^= bit;
+
+            pii cur = dp[i ^ bit];
+            cur.s += v[63 - __builtin_clzll(bit)];
+            if(!cur.f)
+                cur.f++;
+
+            if(cur.s > x) {
+                cur.s = v[63 - __builtin_clzll(bit)];
+                cur.f++;
             }
-
-        ans = (ans + dp[0][0])%mod;
+            dp[i] = min(dp[i], cur);
+        }
     }
-
-    cout << ans << endl;
+    cout << dp[mx - 1].f << endl;
 }

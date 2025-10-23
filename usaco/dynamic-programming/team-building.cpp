@@ -29,47 +29,48 @@ void setIO(string s) {
 typedef pair<ll, ll> pii;
 typedef vector<vector<char>> mat;
 typedef pair<int, string> pis;
-const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
+const ll mod = 1e9 + 9, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
-    int n;
-    cin >> n;
-    vector<int> v(n);
-
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
+int dp[1005][1005][15];
+void solve() {
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<int> a(n), b(m);
+    for(int i = 0; i < n; i++)
+        cin >> a[i];
+    for(int i = 0; i < m; i++)
+        cin >> b[i];
     
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
+    sort(all(a));
+    sort(all(b));
+    
     memset(dp, 0, sizeof dp);
     
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
-
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
-
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
+    dp[0][0][k] = 1;
+    for(int i = 0; i <= n; i++)
+        for(int j = 0; j <= m; j++)
+            for(int x = k; x >= 0; x--) {
+                if(i + 1 <= n)
+                    dp[i + 1][j][x] = (dp[i + 1][j][x] + dp[i][j][x])%mod;
+                if(j + 1 <= m)
+                    dp[i][j + 1][x] = (dp[i][j + 1][x] + dp[i][j][x])%mod;
+                if(i + 1 <= n && j + 1 <= m)
+                    dp[i + 1][j + 1][x] = (dp[i + 1][j + 1][x] - dp[i][j][x] + mod)%mod;
+            
+                if(x && a[i] > b[j])
+                    dp[i + 1][j + 1][x - 1] = (dp[i + 1][j + 1][x - 1] + dp[i][j][x])%mod;
             }
+            
+    cout << dp[n][m][0] << endl;
+}
 
-        ans = (ans + dp[0][0])%mod;
-    }
-
-    cout << ans << endl;
+int32_t main() {
+    setIO("team");
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

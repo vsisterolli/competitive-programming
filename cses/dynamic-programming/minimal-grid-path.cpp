@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -33,43 +32,62 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
+void solve() {
     int n;
     cin >> n;
-    vector<int> v(n);
 
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
-    
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
+    int dp[2 * n  + 5][26][26];
+    char m[n + 5][n + 5];
     memset(dp, 0, sizeof dp);
-    
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
 
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            cin >> m[i][j];
 
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
+    string ans = "";
+
+    int curi = 0, curj = 0;
+
+    vector<pii> q;
+    q.push_back({0, 0});
+
+    bool used[n + 1][n + 1];
+    memset(used, 0, sizeof used);
+    while(q.size()) {
+        char best = 'Z';
+
+        vector<pii> nq;
+        for(pii &i : q) 
+            best = min(best, m[i.f][i.s]);
+
+        for(pii &i : q) 
+            if(m[i.f][i.s] == best) {
+                if(i.f + 1 < n && !used[i.f + 1][i.s]) {
+                    nq.push_back({i.f + 1, i.s});
+                    used[i.f + 1][i.s] = 1;
+                }
+                if(i.s + 1 < n && !used[i.f][i.s + 1]) {
+                    nq.push_back({i.f, i.s + 1});
+                    used[i.f][i.s + 1] = 1;
                 }
             }
 
-        ans = (ans + dp[0][0])%mod;
-    }
+        q = nq;        
 
-    cout << ans << endl;
+        cout << best;
+
+
+
+    }
+    cout << endl;
+
+}
+
+int32_t main() {
+    FAST;
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

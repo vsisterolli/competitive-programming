@@ -33,43 +33,55 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
+void solve() {
     int n;
     cin >> n;
-    vector<int> v(n);
 
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
-    
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
-    
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
+    int mat[n][n];
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            cin >> mat[i][j];
 
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
+    int mx = (1<<n);
 
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
+    int val[mx];
+    for(int i = 0; i < mx; i++) {
+        val[i] = 0;
+        for(int j = 0; j < n; j++)
+            for(int k = j + 1; k < n; k++) {
+                if(!((1<<j) & i) || !((1<<k) & i))
+                    continue;
+
+                val[i] += mat[j][k];
             }
-
-        ans = (ans + dp[0][0])%mod;
     }
 
-    cout << ans << endl;
+    int dp[mx];
+
+    for(int i = 0; i < mx; i++) {
+        dp[i] = val[i];
+
+        vector<int> masks = {0};
+    
+        for(int j = i; j; j ^= (j & (-j))) {
+            int sz = masks.size();
+            for(int k = 0; k < sz; k++)
+                masks.push_back(masks[k] | (j & (-j)));
+        }
+
+        for(int &j : masks)
+            dp[i] = max(dp[i], dp[j] + dp[i ^ j]);
+    
+    }
+
+    cout << dp[mx - 1] << endl;
+}
+
+int32_t main() {
+    FAST;
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

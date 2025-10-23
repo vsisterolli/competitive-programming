@@ -10,7 +10,6 @@
 #define fin cin
 #define fout cout
 #define s second
-#define int long long
 #define FAST cin.tie(0), cout.tie(0), ios::sync_with_stdio(0)
 #define debug(x) cerr << "DEBUG " << x << endl
 #define debug2(x, y) cerr << "DEBUG " << x << " " << y << endl
@@ -33,43 +32,51 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
-    int n;
-    cin >> n;
-    vector<int> v(n);
+void solve() {
+    int n, m;
+    cin >> n >> m;
+    vector<int> p(n), b(m);
+    vector<vector<int>> good(n);
+    for(int i = 0; i < n; i++)
+        cin >> p[i];
+    for(int i = 0; i < m; i++) 
+        cin >> b[i];
 
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
-    
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
-    
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
+    int mx = (1<<m);
+    for(int i = 0; i < mx; i++) {
+        int sum = 0;
+        for(int j = 0; j < m; j++)
+            if((1<<j) & i)
+                sum += b[j];
 
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
-
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
-            }
-
-        ans = (ans + dp[0][0])%mod;
+        for(int j = 0; j < n; j++)
+            if(p[j] == sum) 
+                good[j].push_back(i);
     }
 
-    cout << ans << endl;
+    vector<int> dp(mx, -1);
+    dp[0] = 0;
+    for(int i = 0; i < mx; i++) {
+        if(dp[i] < 0)
+            continue;
+            
+        if(dp[i] == n) {
+            cout << "YES" << endl;
+            return;
+        }
+        for(int &j : good[dp[i]]) {
+            if(j & i) continue;
+            dp[j | i] = dp[i] + 1;
+        }
+    }
+    cout << "NO" << endl;
+}
+
+int32_t main() {
+    FAST;
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }

@@ -33,43 +33,58 @@ const ll mod = 1e9 + 7, MAXN = 2e5 + 5;
 typedef vector<int> vi;
 typedef pair<int, pair<int, int>> piii;
 
-int32_t main() {
+void solve() {
     int n;
     cin >> n;
-    vector<int> v(n);
-
-    for(int i = 0; i < n; i++) 
-        cin >> v[i];
     
-    int mn = *min_element(all(v));
-    if(!(n & 1))
-        mn = 0;
-        
-    int dp[n + 1][1005];
-    memset(dp, 0, sizeof dp);
-    
-    int ans = 0;
-    for(int x = mn; x >= 0; x--) {
+    vector<int> l, r;
 
-        for(int i = n - 1; i >= 0; i--)
-            for(int sum = 0; sum <= 1000; sum++) {
-                dp[i][sum] = (sum ? dp[i][sum - 1] : 0);
-                if(sum <= v[i] - x) {
-                    int val = (dp[i + 1][v[i] - x - sum]);
-                    if(i == n - 1)
-                        val = 1;
+    r.push_back(0);    
+    l.push_back(0);
 
-                    if(val < 0)
-                        val += mod;
-                        
-                    dp[i][sum] = dp[i][sum] + val;
-                    if(dp[i][sum] >= mod)
-                        dp[i][sum] -= mod;
-                }
-            }
+    for(int i = 0; i < n; i++) {
+        int x;
+        cin >> x;   
 
-        ans = (ans + dp[0][0])%mod;
+        if(x > 0)
+            r.push_back(x);
+        else l.push_back(x);
     }
 
-    cout << ans << endl;
+    sort(all(r));
+    sort(all(l), greater<int>());
+    
+    n = l.size();
+    int m = r.size();
+
+    int dp[n + 1][m + 1][2];
+    memset(dp, 0, sizeof dp);
+    
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < m; j++) {
+            if(i == 0 && j == 0)
+                continue;
+
+            dp[i][j][0] = dp[i][j][1] = 1e18;
+            if(i) {
+                dp[i][j][0] = dp[i - 1][j][0] + abs(l[i] - l[i - 1]) * (n + m - 1 - i - j);
+                dp[i][j][0] = min(dp[i][j][0], dp[i - 1][j][1] + abs(l[i] - r[j]) * (n + m - 1 - i - j));
+            }
+            if(j) {
+                dp[i][j][1] = dp[i][j - 1][0] + abs(r[j] - l[i]) * (n + m - 1 - i - j);
+                dp[i][j][1] = min(dp[i][j][1], dp[i][j - 1][1]  + abs(r[j] - r[j - 1]) * (n + m - 1 - i - j));
+            }
+
+        }
+
+    cout << min(dp[n - 1][m - 1][0], dp[n - 1][m - 1][1]) << endl;
+}
+
+int32_t main() {
+    setIO("cowrun");
+    int ct = 1;
+    // cin >> ct;
+    while(ct--)
+        solve();
+    return 0;
 }
